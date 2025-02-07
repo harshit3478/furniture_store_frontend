@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -23,13 +24,28 @@ export default function Signup() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       console.error('Error signing up with Google:', error);
     }
   };
 
   return (
+    <div className='bg-gray-100'>
+      <header className="bg-white shadow-sm">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href={'/'} >
+                <h1 className="text-xl font-bold text-gray-800">Furniture Store</h1>
+                </Link>
+              </div>
+            </div>
+           
+          </div>
+        </nav>
+      </header>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
@@ -79,15 +95,27 @@ export default function Signup() {
             </button>
           </div>
         </form>
-        <div>
+        <div className="flex flex-col items-center justify-center gap-5">
           <button
             onClick={handleGoogleSignup}
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             Sign up with Google
           </button>
+          <div>
+
+          <span className="mt-2 text-sm text-gray-600">
+            Already have an account?
+          </span>
+          <a href="/login" className="text-indigo-600 hover:text-indigo-700">
+            Login
+          </a>
+          </div>
+
+
         </div>
       </div>
+    </div>
     </div>
 
   );
