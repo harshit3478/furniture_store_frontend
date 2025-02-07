@@ -24,7 +24,7 @@ export default function Login() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       console.error('Error logging in with Google:', error);
     }
