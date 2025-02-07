@@ -10,7 +10,7 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleEmailSignup = async (e) => {
+  const handleEmailSignup = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);

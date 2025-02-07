@@ -10,7 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleEmailLogin = async (e) => {
+  const handleEmailLogin = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -105,7 +105,7 @@ export default function Login() {
           <div>
 
           <span className="mt-2 text-sm text-gray-600">
-            Don't have an account?
+            Don&apos;t have an account?
           </span>
           <a href="/signup" className="text-indigo-600 hover:text-indigo-700">
             Signup
