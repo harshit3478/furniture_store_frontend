@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -20,22 +21,21 @@ export async function GET(request: NextRequest) {
   });
 
   try {
-    const filter = {
-      AND: [
-        { name: { contains: query, mode: 'insensitive' } },
-        categories.length > 0 ? { category: { in: categories } } : {},
-        { price: { gte: minPrice, lte: maxPrice } },
-      ],
+    const filters: Prisma.ProductWhereInput = {
+      name: query ? { contains: query, mode: 'insensitive' } : undefined,
+      category: categories.length > 0 ? { in: categories } : undefined,
+      price: { gte: minPrice, lte: maxPrice },
     };
 
     // Log Prisma filter before querying
-    console.log('Prisma filter:', JSON.stringify(filter, null, 2));
+    console.log('Prisma filter:', JSON.stringify(filters, null, 2));
 
     const products = await prisma.product.findMany({
-      where: filter,
-      orderBy: sortBy === 'price_asc' ? { price: 'asc' } :
-               sortBy === 'price_desc' ? { price: 'desc' } :
-               { name: 'asc' },
+      where: filters,
+      orderBy: 
+        sortBy === 'price_asc' ? { price: 'asc' } :
+        sortBy === 'price_desc' ? { price: 'desc' } :
+        { name: 'asc' },
     });
 
     // Log the number of products found
