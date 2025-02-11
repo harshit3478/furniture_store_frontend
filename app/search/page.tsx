@@ -1,22 +1,31 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
-import { products } from "@/data/products";
 import SearchFilters from "@/components/SearchFilters";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Product from "@/components/Product";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string;
+  rating: number;
+  description: string;
+}
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const query = searchParams.get("query")?.toLowerCase() || "";
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "name">(
-    "name"
-  );
+  const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "name">("name");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleSortChange = (sort: string) => {
     if (sort === "name" || sort === "price_asc" || sort === "price_desc") {
@@ -24,40 +33,45 @@ function SearchPageContent() {
     }
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (selectedCategories.length > 0) {
-      params.set("categories", selectedCategories.join(","));
-    } else {
-      params.delete("categories");
+  // Fetch products from PostgreSQL via API
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append("query", query);
+      params.append("minPrice", priceRange[0].toString());
+      params.append("maxPrice", priceRange[1].toString());
+      params.append("sortBy", sortBy);
+
+      if (selectedCategories.length > 0) {
+        params.append("categories", selectedCategories.join(","));
+      }
+
+      // Log constructed URL
+      console.log(`Fetching products with URL: /api/products/search?${params.toString()}`);
+
+      const response = await fetch(`/api/products/search?${params}`);
+      const result = await response.json();
+
+      // Log API response
+      console.log("API Response:", result);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      setProducts(result as Product[]);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false);
     }
-    params.set("minPrice", priceRange[0].toString());
-    params.set("maxPrice", priceRange[1].toString());
-    params.set("sort", sortBy);
+  };
 
-    router.replace(`/search?${params.toString()}`, { scroll: false });
-  }, [selectedCategories, priceRange, sortBy]);
-
-  const filteredProducts = products
-    .filter(
-      (product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
-    )
-    .filter(
-      (product) =>
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(product.category)
-    )
-    .filter(
-      (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1]
-    )
-    .sort((a, b) => {
-      if (sortBy === "price_asc") return a.price - b.price;
-      if (sortBy === "price_desc") return b.price - a.price;
-      return a.name.localeCompare(b.name);
-    });
+  // Refetch products when filters or sorting change
+  useEffect(() => {
+    fetchProducts();
+  }, [query, selectedCategories, priceRange, sortBy]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -78,23 +92,18 @@ function SearchPageContent() {
             <h1 className="text-2xl font-bold mb-6">
               {query ? `Search results for "${query}"` : "All Products"}
               <span className="text-gray-500 ml-2">
-                ({filteredProducts.length} items)
+                ({products.length} items)
               </span>
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                  <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg">{product.name}</h3>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-indigo-600 font-bold">${product.price}</span>
-                      <span className="text-sm text-gray-500">{product.category}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
+                {products.map((product) => (
+                  <Product key={product.id} product={product} onDelete={()=> {}} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
