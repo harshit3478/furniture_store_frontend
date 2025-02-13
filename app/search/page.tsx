@@ -20,8 +20,11 @@ interface Product {
 function SearchPageContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query")?.toLowerCase() || "";
+  const categoryFromUrl = searchParams.get("category")?.toLowerCase() || "";
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    categoryFromUrl ? [categoryFromUrl] : []
+  );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "name">("name");
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,7 +41,7 @@ function SearchPageContent() {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.append("query", query);
+      if (query) params.append("query", query);
       params.append("minPrice", priceRange[0].toString());
       params.append("maxPrice", priceRange[1].toString());
       params.append("sortBy", sortBy);
@@ -47,13 +50,11 @@ function SearchPageContent() {
         params.append("categories", selectedCategories.join(","));
       }
 
-      // Log constructed URL
       console.log(`Fetching products with URL: /api/products/search?${params.toString()}`);
 
       const response = await fetch(`/api/products/search?${params}`);
       const result = await response.json();
 
-      // Log API response
       console.log("API Response:", result);
 
       if (!response.ok) {
@@ -73,6 +74,13 @@ function SearchPageContent() {
     fetchProducts();
   }, [query, selectedCategories, priceRange, sortBy]);
 
+  // Update selectedCategories when categoryFromUrl changes
+  useEffect(() => {
+    if (categoryFromUrl && !selectedCategories.includes(categoryFromUrl)) {
+      setSelectedCategories([categoryFromUrl]);
+    }
+  }, [categoryFromUrl]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
@@ -90,7 +98,7 @@ function SearchPageContent() {
           </div>
           <div className="flex-1 text-slate-900">
             <h1 className="text-2xl font-bold mb-6">
-              {query ? `Search results for "${query}"` : "All Products"}
+              {query ? `Search results for "${query}"` : categoryFromUrl ? `${categoryFromUrl.charAt(0).toUpperCase() + categoryFromUrl.slice(1)}` : "All Products"}
               <span className="text-gray-500 ml-2">
                 ({products.length} items)
               </span>
@@ -111,6 +119,7 @@ function SearchPageContent() {
     </div>
   );
 }
+
 
 export default function SearchPage() {
   return (

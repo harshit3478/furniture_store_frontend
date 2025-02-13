@@ -19,6 +19,14 @@ model User {
   name  String?
 }
 
+model Vendor {
+  id       String    @id @default(cuid())
+  name     String
+  email    String    @unique
+  address  String
+  products Product[]
+}
+
 model Product {
   id          String   @id @default(cuid())
   name        String
@@ -27,5 +35,8 @@ model Product {
   rating      Float
   image       String
   description String
+  quantity    Int      @default(0)
   createdAt   DateTime @default(now())
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
 }
