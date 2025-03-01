@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ProductType } from '@/types/product';
+import Product from '@/components/Product';
+import { auth } from '@/lib/firebase';
 export default function Home() {
   const [products, setProducts] = useState<ProductType[]>([]);
   
@@ -12,12 +13,26 @@ export default function Home() {
     const fetchProducts = async () => {
       const response = await fetch('/api/products');
       const productsList = await response.json();
-      console.log(productsList);
-      setProducts(productsList);
+
+      console.log(productsList.products);
+      setProducts(productsList.products);
     };
 
     fetchProducts();
   }, []);
+
+  // set the firebase token in local storage
+  useEffect(() => {
+    const setToken = async () => {
+      const token = await auth.currentUser?.getIdToken();
+      localStorage
+        .setItem('firebaseToken', token || '');
+        console.log("Token set in local storage", token);
+    };
+    setToken();
+  }
+  , []);
+
 
   return (
     <div className="bg-gray-100 flex flex-col">
@@ -46,28 +61,7 @@ export default function Home() {
         <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Featured Products</h2>
         <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {products.map((product : ProductType) => (
-            <div key={product.id} className="group relative">
-              <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-center object-cover lg:w-full lg:h-full"
-                  width={300}
-                  height={300}
-                />
-              </div>
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-700">
-                    <a href="#">
-                      <span aria-hidden="true" className="absolute inset-0" />
-                      {product.name}
-                    </a>
-                  </h3>
-                </div>
-                <p className="text-sm font-medium text-gray-900">${product.price}</p>
-              </div>
-            </div>
+            <Product key={product.id} product={product} />
           ))}
         </div>
       </div>

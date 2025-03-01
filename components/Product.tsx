@@ -1,101 +1,77 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ProductType } from "@/types/product"
-import { TrashIcon, PencilIcon } from "@heroicons/react/24/outline"
-import { toast } from "react-hot-toast"
-import * as Dialog from "@radix-ui/react-dialog"
+import { useState } from "react";
+import { ProductType } from "@/types/product";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/lib/cartContext";
+import { ShoppingCartIcon} from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
 
 interface ProductProps {
-  product: ProductType
-  onDelete: (id: string) => void
+  product: ProductType;
 }
 
-export default function Product({ product, onDelete }: ProductProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export default function Product({ product }: ProductProps) {
+  const { addToCart } = useCart();
+  const router = useRouter();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  // const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
 
-  const handleDelete = async () => {
-    setIsLoading(true)
+  const handleRedirect = () => {
+    router.push(`/products/${product.id}`);
+  };
+
+  const handleAddToCart = () => {
+    setIsAddingToCart(true);
     try {
-      await onDelete(product.id)
-      toast.success("Product deleted successfully")
+      console.log("Adding to cart:", product);
+      addToCart(product.id);
+      toast.success(`${product.name} added to cart!`);
     } catch (error) {
-      toast.error("Failed to delete product")
+      toast.error("Failed to add to cart" + error, { duration: 5000 });
     } finally {
-      setIsLoading(false)
+      setIsAddingToCart(false);
     }
-  }
+  };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
-      <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-48 object-cover" />
-      <div className="p-4">
-        <h2 className="text-gray-800 text-lg font-semibold truncate">{product.name}</h2>
-        <p className="text-gray-600 text-sm mt-1 h-12 overflow-hidden">{product.description}</p>
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-gray-700 font-semibold">${product.price.toFixed(2)}</span>
-          <span className="text-yellow-500">★ {product.rating.toFixed(1)}</span>
+    <div className="relative">
+      {/* Product Image */}
+      <div className="w-full min-h-80  bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none cursor-pointer">
+        <Image
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-center bg-red-300 object-cover cursor-pointer lg:w-full lg:h-full"
+          width={300}
+          height={300}
+          onClick={handleRedirect}
+        />
+      </div>
+
+      {/* Product Details */}
+      <div className="mt-4 flex justify-between  bg-green-400 items-center">
+        <div>
+          <h3 className="text-sm text-gray-700 ">{product.name}</h3>
         </div>
-        <div className="mt-4 flex justify-between items-center">
-          <span className="text-sm text-gray-500">{product.category}</span>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => {
-                /* Implement edit functionality */
-              }}
-              className="p-1 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              <PencilIcon className="h-5 w-5" />
-            </button>
+        <p className="text-sm font-medium text-gray-900">
+          ${product.price.toFixed(2)}
+        </p>
+      </div>
 
-            {/* Delete Button with Dialog */}
-            <Dialog.Root>
-              <Dialog.Trigger asChild>
-                <button
-                  className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              </Dialog.Trigger>
-
-              {/* Dialog Content */}
-              <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-30 z-[100]" />
-                <Dialog.Content
-                  className="fixed z-[101] top-[50%] left-[50%] max-w-md w-full -translate-x-[50%] -translate-y-[50%] bg-white rounded-lg shadow-lg p-6"
-                >
-                  <Dialog.Title className="text-lg font-medium text-gray-900">Confirm Deletion</Dialog.Title>
-                  <Dialog.Description className="mt-2 text-sm text-gray-500">
-                    Are you sure you want to delete this product? This action cannot be undone.
-                  </Dialog.Description>
-
-                  <div className="mt-4 flex justify-end space-x-4">
-                    {/* Cancel Button */}
-                    <Dialog.Close asChild>
-                      <button
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-500"
-                      >
-                        Cancel
-                      </button>
-                    </Dialog.Close>
-
-                    {/* Confirm Delete Button */}
-                    <button
-                      onClick={handleDelete}
-                      disabled={isLoading}
-                      className={`px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {isLoading ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog.Root>
-          </div>
-        </div>
+      {/* Buttons */}
+      <div className="mt-2 flex justify-between items-center">
+        <button
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
+          className={`flex items-center space-x-1 px-3 py-1 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+            isAddingToCart ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <ShoppingCartIcon className="h-5 w-5" />
+          <span>{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+        </button>
       </div>
     </div>
-  )
+  );
 }

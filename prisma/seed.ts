@@ -6,7 +6,7 @@ const userData: Prisma.UserCreateInput[] = [
   {
     email: 'test@test.com',
     name: 'Alice',
-    
+    firebaseUid : '123'
   }
 ]
 

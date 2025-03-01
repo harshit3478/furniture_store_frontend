@@ -6,7 +6,6 @@ import { auth } from "@/lib/firebase";
 import { User } from "firebase/auth";
 import Link from "next/link";
 import Image from "next/image";
-import { FaBeer } from "react-icons/fa";
 import { IoTrendingUp } from "react-icons/io5";
 
 const categories = ["sofas", "tables", "beds", "chairs"];
@@ -112,7 +111,7 @@ export default function Navbar() {
               <div className="relative group">
                 <button className="flex items-center space-x-2">
                   <Image
-                    src={user.photoURL || "/default-avatar.png"}
+                    src={user.photoURL || "/default-avatar.jpg"}
                     alt="User Avatar"
                     width={32}
                     height={32}
@@ -136,12 +135,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex space-x-4">
-                <Link
+                {/* <Link
                   href="/signup"
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Sign Up
-                </Link>
+                </Link> */}
                 <Link
                   href="/login"
                   className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"

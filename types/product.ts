@@ -7,3 +7,15 @@ export  interface ProductType {
     image: string;
     description: string;
 }
+
+export interface CartItem {
+    id: number;
+    productId: string;
+    quantity: number;
+    product: {
+      id: string;
+      name: string;
+      price: number;
+      image: string;
+    };
+  }
