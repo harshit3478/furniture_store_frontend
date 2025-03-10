@@ -3,9 +3,10 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import SearchFilters from "@/components/SearchFilters";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Product from "@/components/Product";
+;
+import { Navbar } from "@/components/navbar/navbar";
+import { Footer } from "@/components/footer";
+import { ProductCard } from "@/components/product-card";
 
 interface Product {
   id: string;
@@ -108,7 +109,7 @@ function SearchPageContent() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
                 {products.map((product) => (
-                  <Product key={product.id} product={product}  />
+                  <ProductCard key={product.id} product={product}  />
                 ))}
               </div>
             )}

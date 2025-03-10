@@ -1,92 +1,150 @@
-'use client'; // Mark this as a client component
+"use client"
 
-import { useEffect, useState, Suspense } from 'react';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import AddToCartButton from './AddToCartButton';
-import { ProductType } from '@/types/product';
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import Link from "next/link"
+import { ChevronRight } from "lucide-react"
+import type { ProductType } from "@/types/product"
+import { ProductImageGallery } from "./components/ProductImageGallery"
+import { ProductDetails } from "./components/ProductDetails"
+import { ProductSkeleton } from "./components/ProductSkeleton"
+import { useToast } from "@/components/ui/use-toast"
+import { Reviews } from "./components/Reviews"
+import { SimilarProducts } from "./components/SimilarProduct"
 
 async function getProduct(id: string): Promise<ProductType> {
-  console.log("Fetching product from:", process.env.NEXT_PUBLIC_API_URL, "with ID:", id);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, { cache: 'no-store' });
-  const result = await res.json();
-  console.log("API response:", result);
-  if (!res.ok) throw new Error('Failed to fetch product');
-  return result.product;
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}`, {
+    cache: "no-store",
+    next: { revalidate: 3600 },
+  })
+  if (!res.ok) throw new Error("Failed to fetch product")
+  const data = await res.json()
+  return data.product
 }
 
+
+
 export default function ProductPage() {
-  const pathname = usePathname();
-  const id = pathname.split('/').pop(); // Extract the last segment (id)
-  const [product, setProduct] = useState<ProductType | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { id } = useParams()
+  const [product, setProduct] = useState<ProductType | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
+
 
   useEffect(() => {
-    if (!id) {
-      setError('Invalid product ID');
-      return;
-    }
-
-    async function fetchProduct() {
+    async function loadProduct() {
       try {
-        if (id) {
-          const data = await getProduct(id);
-          setProduct(data);
-        } else {
-          setError('Invalid product ID');
-        }
+        if (typeof id !== "string") throw new Error("Invalid product ID")
+        const productData = await getProduct(id)
+        setProduct(productData)
       } catch (err) {
-        console.error(err);
-        setError('Failed to load product');
+        console.error(err)
+        setError("Failed to load product. Please try again later.")
+        toast({
+          title: "Error",
+          description: "Failed to load product. Please try again later.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchProduct();
-  }, [id]);
+    loadProduct()
+  }, [id, toast])
+
+
+  if (isLoading) return <ProductSkeleton />
 
   if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
-  if (!product) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div className="bg-white">
+    return (
       <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
-          {/* Product Image */}
-          <div className="lg:max-w-lg lg:self-end">
-            <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={600}
-                height={600}
-                className="w-full h-full object-center object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Product Details */}
-          <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
-            <div className="mt-3">
-              <p className="text-3xl text-gray-900">${product.price.toFixed(2)}</p>
-            </div>
-            <div className="mt-6">
-              <h3 className="sr-only">Description</h3>
-              <div className="text-base text-gray-700 space-y-6">{product.description}</div>
-            </div>
-            <div className="mt-8">
-              <Suspense fallback={<div>Loading...</div>}>
-                <AddToCartButton product={product} />
-              </Suspense>
-            </div>
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+            Oops! Something went wrong.
+          </h1>
+          <p className="mt-4 text-base text-gray-500">{error}</p>
+          <div className="mt-6">
+            <Link href="/" className="text-base font-medium text-indigo-600 hover:text-indigo-500">
+              Go back home<span aria-hidden="true"> &rarr;</span>
+            </Link>
           </div>
         </div>
       </div>
+    )
+  }
+
+  if (!product) return null
+
+  return (
+    <div className="bg-white">
+      {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 py-2 border-b">
+        <nav className="flex items-center text-sm">
+          <Link href="/" className="text-gray-500 hover:text-gray-700">
+            Home
+          </Link>
+          <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />
+          <Link href="/bed-room" className="text-gray-500 hover:text-gray-700">
+            Bed Room
+          </Link>
+          <ChevronRight className="h-4 w-4 mx-1 text-gray-400" />
+          <span className="text-gray-900">{product.name}</span>
+        </nav>
+      </div>
+
+      <div className="max-w-7xl mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ProductImageGallery images={[product.image]} name={product.name} />
+          <ProductDetails product={product} />
+        </div>
+
+        {/* Product Description */}
+        <div className="mt-12 grid md:grid-cols-2 gap-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Product Description:</h2>
+            <p className="text-gray-700">
+              Buy the Flo 3-Seater Sofa - A couch for three. The Flo 3-Seater Sofa is a comfortable, upholstered fixed
+              back sofa that sits pretty for both, looks and comfort. Designed to sit on while you tune in to your next
+              binge series, it adds value to every room it's placed in.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm text-gray-500">Size :</h3>
+                <p className="text-sm">30 x 60 x 100 (in inches)</p>
+              </div>
+              <div className="border rounded-md p-4">
+                <h3 className="text-sm text-gray-500">Material:</h3>
+                <p className="text-sm">Mahogany Wood</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Offers:</h2>
+            <div className="space-y-4">
+              {[1, 2, 3].map((index) => (
+                <div key={index} className="bg-purple-50 rounded-md p-4 flex items-center gap-4">
+                  <div className="text-purple-700 font-semibold">Code10</div>
+                  <div className="border-l border-purple-200 pl-4">
+                    <p className="text-sm">Get 10% off upto ₹200</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Similar Products */}
+        <SimilarProducts />
+        
+        {/* Reviews Section */}
+        <Reviews />
+       
+      </div>
     </div>
-  );
+  )
 }
+
