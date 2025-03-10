@@ -5,12 +5,12 @@ import { BestsellersSection } from "@/app/components/bestsellers-section";
 import { ComboSection } from "@/app/components/combo-section";
 import { OffersSection } from "@/app/components/offers-section";
 import { FaqSection } from "@/app/components/faq-section";
-import { Footer } from "@/components/footer";
 import CustomCarousel from "./components/Carousel";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/authContext";
 import { SyncModal } from "./components/sync-modal";
 import { useCart } from "@/lib/cartContext";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   const { token } = useAuth();
@@ -33,8 +33,8 @@ export default function Home() {
         <ComboSection />
         <OffersSection />
         <FaqSection />
+        <Footer />
       </main>
-      <Footer />
       {syncModal && <SyncModal setShowModal={setSyncModal} showModal={syncModal} />}
     </div>
   );
