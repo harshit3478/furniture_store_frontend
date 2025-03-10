@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { User } from "firebase/auth"
-import { ShoppingCart, User as UserIcon, LogIn } from "lucide-react"
+import { ShoppingCart, UserIcon, LogIn, Heart } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -33,25 +33,29 @@ export function UserNav({ user }: UserNavProps) {
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1 md:gap-2">
+      <Link href="/wishlist">
+        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Wishlist">
+          <Heart className="h-5 w-5 text-gray-600" />
+        </Button>
+      </Link>
+
       <Link href="/cart">
-        <Button variant="ghost" size="icon" aria-label="Cart">
-          <ShoppingCart size={40} className=" text-gray-500" />
+        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Cart">
+          <ShoppingCart className="h-5 w-5 text-gray-600" />
         </Button>
       </Link>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" aria-label="User menu">
             {user ? (
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
                 <AvatarFallback>{user.displayName?.[0] || "U"}</AvatarFallback>
               </Avatar>
             ) : (
-              <Button variant="ghost" size="icon" aria-label="User">
               <UserIcon className="h-5 w-5 text-gray-600" />
-              </Button>
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -89,12 +93,6 @@ export function UserNav({ user }: UserNavProps) {
                   Login
                 </Link>
               </DropdownMenuItem>
-              {/* <DropdownMenuItem asChild>
-                <Link href="/signup" className="flex items-center">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Sign Up
-                </Link>
-              </DropdownMenuItem> */}
             </>
           )}
         </DropdownMenuContent>
@@ -102,3 +100,4 @@ export function UserNav({ user }: UserNavProps) {
     </div>
   )
 }
+

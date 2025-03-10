@@ -107,7 +107,7 @@ export default function ProductPage() {
             <p className="text-gray-700">
               Buy the Flo 3-Seater Sofa - A couch for three. The Flo 3-Seater Sofa is a comfortable, upholstered fixed
               back sofa that sits pretty for both, looks and comfort. Designed to sit on while you tune in to your next
-              binge series, it adds value to every room it's placed in.
+              binge series, it adds value to every room it&apos;s placed in.
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-4">

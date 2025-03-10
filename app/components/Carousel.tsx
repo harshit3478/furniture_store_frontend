@@ -58,25 +58,25 @@ const CustomCarousel = () => {
   */
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-8">
+    <div className="w-[92vw]  mx-auto py-8">
       <Carousel
         opts={{
           align: "start",
           loop: true,
           slidesToScroll: 1,
         }}
-        className="w-full"
+        className="w-full "
         setApi={setApi}
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-4 w-full md:h-[40vh] ">
           {images.map((image, index) => (
-            <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-3/5">
-              <div className="relative h-72 w-full overflow-hidden rounded-lg">
+            <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-[45%]">
+              <div className="relative h-[40vh] w-full rounded-lg">
                 <Image
                   src={image.src}
                   alt={image.alt}
                   fill
-                  className="object-cover"
+                  className="object-cover rounded-lg"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority={index === 0}
                 />

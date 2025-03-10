@@ -22,26 +22,31 @@ export function Navbar() {
   }, [])
 
   return (
-    <header className="sticky top-0 pt-2  pr-4 z-50 w-full border-b bg-background">
-      <div className="up-container flex items-center justify-between px-4 ">
-        <div className="flex items-center gap-4 px-2">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-2 md:gap-4">
           <MobileNav />
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-5xl font-extrabold">LOGO</span>
+          <Link href="/" className="flex items-center">
+            <span className="text-xl font-bold md:text-2xl">Logo</span>
           </Link>
           <LocationSelector />
         </div>
 
-        <div className="flex  items-center justify-center px-4 gap-5 w-2/5 ">
+        <div className="hidden md:flex items-center justify-center gap-4 flex-1 max-w-xl px-4">
           <SearchBar />
-          <UserNav user={user} />
         </div>
 
-      </div>
-      <div className="dropdown-content">
-        <div className="ml-auto flex items-center gap-4 px-4">
-          <MainNav />
+        <div className="flex items-center gap-1">
+          <UserNav user={user} />
         </div>
+      </div>
+
+      <div className="md:hidden px-4 pb-3">
+        <SearchBar />
+      </div>
+
+      <div className="hidden md:block">
+        <MainNav />
       </div>
     </header>
   )

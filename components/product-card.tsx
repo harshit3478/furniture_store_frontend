@@ -1,51 +1,48 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import Image from "next/image"
+import Link from "next/link"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
-import AddToCartButton from "@/app/products/[id]/components/AddToCartButton";
-import { ProductType } from "@/types/product";
+import AddToCartButton from "@/app/products/[id]/components/AddToCartButton"
+import type { ProductType } from "@/types/product"
 
 interface ProductCardProps {
-  product: ProductType;
+  product: ProductType
 }
 
-export function ProductCard({ product}: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   return (
-    <Card className={cn("overflow-hidden  shadow-sm border border-slate-300")}>
+    <Card className={cn("overflow-hidden shadow-sm border border-gray-200 h-full")}>
       <div className="relative">
         {product.discount && (
-          <Badge className="absolute top-2 left-2 bg-amber-500 text-white">Price Drop</Badge>
+          <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-600 text-white font-medium px-2 py-1 rounded-sm">
+            30% off
+          </Badge>
         )}
-       
 
         <Link href={`/products/${product.id}`} className="block overflow-hidden">
           <Image
             src={product.image || "/placeholder.svg"}
-            alt="Similar product"
+            alt={product.name}
             width={250}
-            height={350}
-            className="w-full h-72 object-cover"
+            height={250}
+            className="w-full h-40 md:h-48 object-cover"
           />
         </Link>
       </div>
-      <CardContent className="py-6 pt-2 px-3 ">
-        <div className="flex justify-between mb-2">
-          <h3 className="font-medium">{product.name}</h3>
-        </div>
-        <div className="flex items-baseline mb-4">
+      <CardContent className="p-3">
+        <h3 className="font-medium text-sm">{product.name}</h3>
+        <div className="flex items-baseline mt-1 mb-3">
           <span className="text-sm font-semibold">₹{product.price}</span>
           <span className="text-xs text-gray-500 ml-1">/month</span>
-          <span className="text-xs text-gray-400 line-through ml-2">
-            ₹{Math.round(product.price * 1.2)}/month
-          </span>
+          <span className="text-xs text-gray-400 line-through ml-2">₹{Math.round(product.price * 1.2)}/month</span>
         </div>
         <AddToCartButton product={product} />
       </CardContent>
     </Card>
-  );
+  )
 }
 

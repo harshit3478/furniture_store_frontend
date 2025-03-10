@@ -2,7 +2,7 @@
 module.exports = {
     darkMode: ["class"],
     content: [
-    "./app/**/*.{js,ts,jsx,tsx}", // Note the addition of the `app` directory if you are using the new Next.js App Router
+    "./app/**/*.{js,ts,jsx,tsx}", 
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
@@ -54,7 +54,11 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+		fontFamily : {
+			gilroy : ["var(--font-gilroy)"],
+			roboto : ["var(--font-roboto)"],
+		}
   	}
   },
   plugins: [require("daisyui"), require('@tailwindcss/forms'), require('@tailwindcss/typography'), require("tailwindcss-animate")],
