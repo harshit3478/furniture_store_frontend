@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import SearchFilters from "@/components/SearchFilters";
 ;
 import { Navbar } from "@/components/navbar/navbar";
-import { Footer } from "@/components/footer";
+import { Footer } from "@/components/footer/Footer";
 import { ProductCard } from "@/components/product-card";
 
 interface Product {

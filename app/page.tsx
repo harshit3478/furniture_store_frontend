@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/authContext";
 import { SyncModal } from "./components/sync-modal";
 import { useCart } from "@/lib/cartContext";
-import { Footer } from "@/components/footer";
+import { Footer } from "@/components/footer/Footer";
 
 export default function Home() {
   const { token } = useAuth();
