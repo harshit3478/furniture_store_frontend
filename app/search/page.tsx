@@ -50,7 +50,7 @@ function SearchPageContent() {
         params.append("categories", selectedCategories.join(","))
       }
 
-      console.log(`Fetching products with URL: /api/products/search?${params.toString()}`)
+      console.log(`Fetching products with URL: ${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params.toString()}`)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params}`)
       const result = await response.json()

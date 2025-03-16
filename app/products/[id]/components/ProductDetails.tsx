@@ -26,8 +26,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     setQuantity(quantity + 1)
   }
 
- 
-
   return (
     <div>
       <div className="mb-4">
@@ -82,14 +80,25 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <span className="text-sm">Quantity</span>
       </div>
 
-      <div className="space-y-3">
-       <AddToCartButton product={product} />
+      {/* Desktop Action Buttons */}
+      <div className="hidden md:flex flex-col space-y-3">
+        <AddToCartButton product={product}  duration={months}/>
         <Button variant="outline" className="w-full">
           Rent Now
         </Button>
       </div>
 
-      
+      {/* Mobile Fixed Bottom Buttons */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 grid grid-cols-2 gap-0.5 bg-white border-t z-50">
+        <AddToCartButton product={product}  className="py-4 px-4 bg-primary text-white font-medium text-md rounded-none" duration={months}/>
+        
+        <button onClick={() => {}} className="py-4 px-4 bg-primary text-white font-medium text-md border-l">
+          Rent Now
+        </button>
+      </div>
+
+      {/* Mobile Bottom Padding */}
+      <div className="h-16 md:hidden" />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 interface CartContextType {
   cart: CartItem[];
   localCart: LocalCartItem[];
-  addToCart: (product: ProductType, quantity: number, duration?: string) => Promise<void>;
+  addToCart: (product: ProductType, quantity: number, duration: number) => Promise<void>;
   removeFromCart: (cartItemId: number | string) => Promise<void>;
   updateQuantity: (cartItemId: number | string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -23,7 +23,7 @@ interface LocalCartItem {
   productId: string;
   quantity: number;
   product: ProductType;
-  duration: string;
+  duration: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -100,7 +100,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addToCart = async (product: ProductType, quantity: number, duration: string = "monthly") => {
+  const addToCart = async (product: ProductType, quantity: number, duration: number) => {
     if (token) {
       setIsLoading(true);
       setError(null);
@@ -191,6 +191,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         toast.error("Network error. Please check your connection.");
       } finally {
         setIsLoading(false);
+        //reload the page
+        window.location.reload();
       }
     } else {
       // For guest users, cartItemId could be either the product ID or the local item ID
@@ -202,7 +204,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (newCart.length < prevCart.length) {
           toast.success("Item removed from cart");
         }
-        
+        // reload the page
+        window.location.reload();
         return newCart;
       });
     }

@@ -46,7 +46,7 @@ export function SimilarProducts() {
   return (
     <div className="flex flex-col space-y-4 my-10">
       <h2 className="text-black font-semibold text-2xl">Similar Products :</h2>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 md:gap-10 md:grid-cols-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, index) => (
               <Skeleton key={index} className="h-72 w-full" />

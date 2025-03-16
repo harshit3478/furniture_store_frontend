@@ -5,8 +5,15 @@ import { useCart } from "@/lib/cartContext"
 import { useRouter } from "next/navigation"
 import type { ProductType } from "@/types/product"
 import { ArrowRight, Loader, ShoppingCart } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export default function AddToCartButton({ product }: { product: ProductType }) {
+interface AddToCartButtonProps {
+  product: ProductType
+  className?: string
+  duration?: number
+}
+
+export default function AddToCartButton({ product, className = "" , duration = 3}: AddToCartButtonProps) {
   const { addToCart, cart, localCart } = useCart()
   const router = useRouter()
   const [isAdding, setIsAdding] = useState(false)
@@ -29,7 +36,7 @@ export default function AddToCartButton({ product }: { product: ProductType }) {
       }
       setIsAdding(true)
       console.log("Adding to cart:", product)
-      addToCart(product, 1)
+      addToCart(product, 1, duration)
       setIsAdded(true)
     } catch (error) {
       console.error("Failed to add item to cart", error)
@@ -42,7 +49,10 @@ export default function AddToCartButton({ product }: { product: ProductType }) {
     <button
       onClick={handleAddToCart}
       disabled={isAdding}
-      className="w-full bg-black text-white py-1.5 px-2 flex justify-center gap-2 items-center rounded-md hover:bg-gray-800 disabled:opacity-50 text-sm"
+      className={cn(
+        "w-full bg-primary text-white py-1.5 px-2 flex justify-center gap-2 items-center rounded-md hover:bg-primary-foreground disabled:opacity-50 text-sm",
+        className
+      )}
     >
       {isAdding ? (
         <Loader className="animate-spin h-4 w-4" />

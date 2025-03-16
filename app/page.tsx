@@ -2,7 +2,7 @@
 import { Navbar } from "@/components/navbar/navbar";
 import { CategorySection } from "@/app/components/category-section";
 import { BestsellersSection } from "@/app/components/bestsellers-section";
-import { ComboSection } from "@/app/components/combo-section";
+// import { ComboSection } from "@/app/components/combo-section";
 import { OffersSection } from "@/app/components/offers-section";
 import { FaqSection } from "@/app/components/faq-section";
 import CustomCarousel from "./components/Carousel";
@@ -30,7 +30,7 @@ export default function Home() {
         <CustomCarousel />
         <CategorySection />
         <BestsellersSection />
-        <ComboSection />
+        {/* <ComboSection /> */}
         <OffersSection />
         <FaqSection />
         <Footer />

@@ -20,5 +20,6 @@ export interface CartItem {
   productId: string;
   quantity: number;
   product: ProductType;
-  duration: string;
+  duration: number;
 }
+
