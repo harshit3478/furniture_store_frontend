@@ -4,16 +4,11 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cartContext";
 import { AuthProvider } from "@/lib/authContext";
 import localFont from 'next/font/local';
-import { Roboto } from 'next/font/google';
+import { WishlistProvider } from "@/lib/wishlist-context";
 
 const gilroy = localFont({
   src: './../public/fonts/Gilroy-Regular.ttf',
   variable: '--font-gilroy',
-});
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['400', '500'],
 });
 
 
@@ -34,7 +29,9 @@ export default function RootLayout({
       <body className={`${gilroy.className}`}>
         <AuthProvider>
           <CartProvider>
+            <WishlistProvider>
             {children}
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </body>

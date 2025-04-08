@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 import AddToCartButton from "@/app/products/[id]/components/AddToCartButton"
+import { WishlistButton } from "./ui/wishlist-button"
 import type { ProductType } from "@/types/product"
 
 interface ProductCardProps {
@@ -22,6 +23,8 @@ export function ProductCard({ product }: ProductCardProps) {
             30% off
           </Badge>
         )}
+
+        <WishlistButton product={product} className="absolute top-2 right-2 bg-white/80 hover:bg-white" />
 
         <Link href={`/products/${product.id}`} className="block overflow-hidden">
           <Image

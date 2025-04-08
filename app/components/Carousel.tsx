@@ -58,7 +58,7 @@ const CustomCarousel = () => {
   */
 
   return (
-    <div className="w-[92vw]  mx-auto py-8">
+    <div className="w-[92vw]  mx-auto py-8 pb-2 ">
       <Carousel
         opts={{
           align: "start",
@@ -68,10 +68,10 @@ const CustomCarousel = () => {
         className="w-full "
         setApi={setApi}
       >
-        <CarouselContent className="-ml-4 w-full md:h-[40vh] ">
+        <CarouselContent className="-ml-4 w-full md:h-[40vh] h-auto ">
           {images.map((image, index) => (
-            <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-[45%]">
-              <div className="relative h-[40vh] w-full rounded-lg">
+            <CarouselItem key={index} className="pl-4 md:basis-1/1 lg:basis-[90%] xl:basis-[45%] sm:basis-1/1">
+              <div className="relative aspect-[16/8] md:aspect-[16/9]  rounded-lg">
                 <Image
                   src={image.src}
                   alt={image.alt}
@@ -86,8 +86,8 @@ const CustomCarousel = () => {
           ))}
         </CarouselContent>
         
-        <CarouselPrevious className="absolute -left-4 z-10 top-1/2 transform -translate-y-1/2" />
-        <CarouselNext className="absolute -right-4 z-10 top-1/2 transform -translate-y-1/2" />
+        <CarouselPrevious className="absolute -left-4 z-10 top-1/2 transform -translate-y-1/2 hidden md:block" />
+        <CarouselNext className="absolute -right-4 z-10 top-1/2 transform -translate-y-1/2 hidden md:block"  />
         
         {/* Pagination dots */}
         <div className="flex justify-center gap-2 mt-4">

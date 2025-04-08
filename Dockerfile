@@ -15,6 +15,9 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
+# Remove the .env file 
+RUN rm .env
+
 # Expose port 3000 (default for Next.js)
 EXPOSE 3000
 
