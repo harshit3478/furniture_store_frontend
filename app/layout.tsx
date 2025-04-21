@@ -31,6 +31,7 @@ export default function RootLayout({
           <CartProvider>
             <WishlistProvider>
             {children}
+            <Analytics/>
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>
