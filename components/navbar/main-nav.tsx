@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 
-import {  ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 // Define furniture categories and subcategories
 const categories = [
@@ -64,7 +64,6 @@ const categories = [
 ];
 
 export function MainNav() {
-
   return (
     <nav className="hidden md:flex items-center justify-between w-full border-b border-gray-200">
       <ul className="flex space-x-0 items-center">
@@ -94,25 +93,30 @@ export function MainNav() {
         ))}
       </ul>
       <ul className="flex space-x-3">
-        <li>
+        {/* <li>
           <Link
             href="/business"
             className="text-gray-700  hover:text-gray-900 px-4 py-2 text-sm "
           >
             Business
           </Link>
-        </li>
+        </li> */}
         <li>
-          <Link
-            href="/faqs"
+          <a
+            href="#faqs"
             className="text-gray-700 hover:text-gray-900 px-4 py-2 text-sm"
+            onClick={(e) => {
+              e.preventDefault();
+              const faqsSection = document.querySelector("#faqs");
+              if (faqsSection) {
+                faqsSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
             FAQs
-          </Link>
+          </a>
         </li>
       </ul>
     </nav>
   );
 }
-
-

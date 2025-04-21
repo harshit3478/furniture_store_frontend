@@ -2,12 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useAuth } from "./authContext";
-import { CartItem, ProductType } from "@/types/product";
+import { CartItemType, LocalCartItemType, ProductType } from "@/types/product";
 import { toast } from "react-hot-toast";
 
 interface CartContextType {
-  cart: CartItem[];
-  localCart: LocalCartItem[];
+  cart: CartItemType[];
+  localCart: LocalCartItemType[];
   addToCart: (product: ProductType, quantity: number, duration: number) => Promise<void>;
   removeFromCart: (cartItemId: number | string) => Promise<void>;
   updateQuantity: (cartItemId: number | string, quantity: number) => Promise<void>;
@@ -18,25 +18,16 @@ interface CartContextType {
   error: string | null;
 }
 
-interface LocalCartItem {
-  id: string; // Use a unique ID for local cart items
-  productId: string;
-  quantity: number;
-  product: ProductType;
-  duration: number;
-}
-
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { token, user } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [localCart, setLocalCart] = useState<LocalCartItem[]>([]);
+  const [cart, setCart] = useState<CartItemType[]>([]);
+  const [localCart, setLocalCart] = useState<LocalCartItemType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   
-  console.log("user : " , user?.email)
   // Load localCart from localStorage on initial mount
   useEffect(() => {
     const storedCart = localStorage.getItem("localCart");
@@ -106,13 +97,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       
       try {
+        const price = duration == 6 ? product.websitePrices?.sixMonths : duration == 9 ? product.websitePrices?.nineMonths : product.websitePrices?.twelveMonths
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ productId: product.id, quantity, duration }),
+          body: JSON.stringify({ productId: product.id, quantity, duration,pricePerMonth: price  }),
           credentials: "include",
         });
         
@@ -147,12 +139,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           return newCart;
         } else {
           // Add new item with a unique ID for local cart
-          const newItem: LocalCartItem = {
+          const price = duration == 6 ? product.websitePrices?.sixMonths : duration == 9 ? product.websitePrices?.nineMonths : product.websitePrices?.twelveMonths
+          const newItem: LocalCartItemType = {
             id: `local-${Date.now()}-${product.id}`,
             productId: product.id,
             quantity,
             product,
-            duration
+            duration,
+            total : quantity * price * duration,
+            pricePerMonth: price
           };
           toast.success(`${product.name} added to cart`);
           return [...prevCart, newItem];

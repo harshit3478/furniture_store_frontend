@@ -1,37 +1,72 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useState, useEffect, Suspense } from "react"
 import SearchFilters from "./components/search-filters"
 import { ProductCard } from "@/components/product-card"
 import { Skeleton } from "@/components/ui/skeleton"
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  category: string
-  image: string
-  rating: number
-  description: string
-}
+import { ProductType } from "@/types/product"
 
 function SearchPageContent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
+  
+  // Read all query parameters
   const query = searchParams.get("query")?.toLowerCase() || ""
-  const categoryFromUrl = searchParams.get("category")?.toLowerCase() || ""
-
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(categoryFromUrl ? [categoryFromUrl] : [])
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000])
-  const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "name">("name")
-  const [products, setProducts] = useState<Product[]>([])
+  const categoriesParam = searchParams.get("categories") || searchParams.get("category") || ""
+  const minPriceParam = searchParams.get("minPrice") || "0"
+  const maxPriceParam = searchParams.get("maxPrice") || "2000"
+  const sortByParam = searchParams.get("sortBy") || "name"
+  
+  // Parse category parameters
+  const categories = categoriesParam ? categoriesParam.split(",") : []
+  
+  // Parse price parameters
+  const minPrice = parseInt(minPriceParam, 10)
+  const maxPrice = parseInt(maxPriceParam, 10)
+  
+  const [products, setProducts] = useState<ProductType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [showSortOptions, setShowSortOptions] = useState(false)
 
+  // Update URL when filters change
+  const updateFilters = (newCategories: string[], newPriceRange: [number, number], newSortBy: string) => {
+    // Create a new URLSearchParams object
+    const params = new URLSearchParams(searchParams.toString())
+    
+    // Update parameters
+    if (newCategories.length > 0) {
+      params.set("categories", newCategories.join(","))
+    } else {
+      params.delete("categories")
+    }
+    
+    params.set("minPrice", newPriceRange[0].toString())
+    params.set("maxPrice", newPriceRange[1].toString())
+    params.set("sortBy", newSortBy)
+    
+    // Keep the query parameter if it exists
+    if (query) {
+      params.set("query", query)
+    }
+    
+    // Update URL without refreshing page
+    router.push(`/search?${params.toString()}`)
+  }
+
+  // Handlers for filter changes
+  const handleCategoryChange = (newCategories: string[]) => {
+    updateFilters(newCategories, [minPrice, maxPrice], sortByParam)
+  }
+
+  const handlePriceChange = (newRange: [number, number]) => {
+    updateFilters(categories, newRange, sortByParam)
+  }
+
   const handleSortChange = (sort: string) => {
-    if (sort === "name" || sort === "price_asc" || sort === "price_desc") {
-      setSortBy(sort)
+    if (["name", "price_asc", "price_desc", "createdAt_desc"].includes(sort)) {
+      updateFilters(categories, [minPrice, maxPrice], sort)
       setShowSortOptions(false) // Close sort options after selection
     }
   }
@@ -42,26 +77,25 @@ function SearchPageContent() {
     try {
       const params = new URLSearchParams()
       if (query) params.append("query", query)
-      params.append("minPrice", priceRange[0].toString())
-      params.append("maxPrice", priceRange[1].toString())
-      params.append("sortBy", sortBy)
+      params.append("minPrice", minPrice.toString())
+      params.append("maxPrice", maxPrice.toString())
+      params.append("sortBy", sortByParam)
 
-      if (selectedCategories.length > 0) {
-        params.append("categories", selectedCategories.join(","))
+      if (categories.length > 0) {
+        params.append("categories", categories.join(","))
       }
 
       console.log(`Fetching products with URL: ${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params.toString()}`)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params}`)
-      const result = await response.json()
-
-      console.log("API Response:", result)
-
+      
       if (!response.ok) {
         throw new Error("Failed to fetch products")
       }
-
-      setProducts(result as Product[])
+      
+      const result = await response.json()
+      console.log("API Response:", result)
+      setProducts(result as ProductType[])
     } catch (error) {
       console.error("Error fetching products:", error)
     } finally {
@@ -69,17 +103,10 @@ function SearchPageContent() {
     }
   }
 
-  // Refetch products when filters or sorting change
+  // Refetch products when URL parameters change
   useEffect(() => {
     fetchProducts()
-  }, [query, selectedCategories, priceRange, sortBy])
-
-  // Update selectedCategories when categoryFromUrl changes
-  useEffect(() => {
-    if (categoryFromUrl && !selectedCategories.includes(categoryFromUrl)) {
-      setSelectedCategories([categoryFromUrl])
-    }
-  }, [categoryFromUrl])
+  }, [searchParams])
 
   const toggleFilters = () => {
     setShowFilters(!showFilters)
@@ -89,6 +116,21 @@ function SearchPageContent() {
     setShowSortOptions(!showSortOptions)
   }
 
+  // Get page title based on parameters
+  const getPageTitle = () => {
+    if (query) {
+      return `Search results for "${query}"`
+    } else if (categories.length === 1) {
+      // Capitalize and format category name
+      const category = categories[0]
+      return category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    } else if (sortByParam === "createdAt_desc") {
+      return "All Products"
+    } else {
+      return "Products"
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
@@ -96,7 +138,7 @@ function SearchPageContent() {
         <div className="flex items-center text-sm text-muted-foreground mb-4 border-b border-slate-200 pb-4">
           <span>Home</span>
           <span className="mx-2">/</span>
-          <span>Bed Room</span>
+          <span>{getPageTitle()}</span>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -104,11 +146,11 @@ function SearchPageContent() {
           <div className="hidden lg:block w-64 space-y-6 border-r border-slate-200 pr-6">
             <div className="text-xl font-semibold mb-4">Filters</div>
             <SearchFilters
-              selectedCategories={selectedCategories}
-              onCategoryChange={setSelectedCategories}
-              priceRange={priceRange}
-              onPriceChange={setPriceRange}
-              sortBy={sortBy}
+              selectedCategories={categories}
+              onCategoryChange={handleCategoryChange}
+              priceRange={[minPrice, maxPrice]}
+              onPriceChange={handlePriceChange}
+              sortBy={sortByParam}
               onSortChange={handleSortChange}
             />
           </div>
@@ -117,11 +159,7 @@ function SearchPageContent() {
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
               <h1 className="text-2xl font-bold">
-                {query
-                  ? `Search results for "${query}"`
-                  : categoryFromUrl
-                    ? `${categoryFromUrl.charAt(0).toUpperCase() + categoryFromUrl.slice(1)}`
-                    : "Bed Room Furniture"}
+                {getPageTitle()}
                 <span className="text-muted-foreground text-sm ml-2">({products.length} items)</span>
               </h1>
 
@@ -130,12 +168,13 @@ function SearchPageContent() {
                 <span className="mr-2 text-sm">Sort By:</span>
                 <select
                   className="border rounded-md px-2 py-1 text-sm bg-background"
-                  value={sortBy}
+                  value={sortByParam}
                   onChange={(e) => handleSortChange(e.target.value)}
                 >
                   <option value="name">Popularity</option>
                   <option value="price_asc">Price: Low to High</option>
                   <option value="price_desc">Price: High to Low</option>
+                  <option value="createdAt_desc">Newest First</option>
                 </select>
               </div>
             </div>
@@ -208,7 +247,7 @@ function SearchPageContent() {
 
       {/* Backdrop for mobile sheets */}
       {(showFilters || showSortOptions) && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/40 z-30"
           onClick={() => {
             setShowFilters(false);
@@ -218,7 +257,7 @@ function SearchPageContent() {
       )}
 
       {/* Mobile Filters Bottom Sheet */}
-      <div 
+      <div
         className={`lg:hidden fixed bottom-0 left-0 right-0 bg-background z-40 rounded-t-xl shadow-lg transition-transform duration-300 transform ${
           showFilters ? 'translate-y-0' : 'translate-y-full'
         } max-h-[70vh] overflow-auto`}
@@ -249,20 +288,17 @@ function SearchPageContent() {
           </div>
           <div className="max-h-[calc(70vh-120px)] overflow-auto">
             <SearchFilters
-              selectedCategories={selectedCategories}
-              onCategoryChange={setSelectedCategories}
-              priceRange={priceRange}
-              onPriceChange={setPriceRange}
-              sortBy={sortBy}
+              selectedCategories={categories}
+              onCategoryChange={handleCategoryChange}
+              priceRange={[minPrice, maxPrice]}
+              onPriceChange={handlePriceChange}
+              sortBy={sortByParam}
               onSortChange={handleSortChange}
             />
           </div>
           <div className="mt-6 sticky bottom-0 bg-background pt-2 pb-4">
             <button
-              onClick={() => {
-                toggleFilters();
-                fetchProducts();
-              }}
+              onClick={toggleFilters}
               className="w-full bg-purple-600 text-white py-3 rounded-md"
             >
               Apply Filters
@@ -272,7 +308,7 @@ function SearchPageContent() {
       </div>
 
       {/* Mobile Sort Options Bottom Sheet */}
-      <div 
+      <div
         className={`lg:hidden fixed bottom-0 left-0 right-0 bg-background z-40 rounded-t-xl shadow-lg transition-transform duration-300 transform ${
           showSortOptions ? 'translate-y-0' : 'translate-y-full'
         } max-h-[50vh] overflow-auto`}
@@ -304,21 +340,27 @@ function SearchPageContent() {
           <div className="space-y-4 py-4">
             <button
               onClick={() => handleSortChange("name")}
-              className={`w-full text-left py-3 px-4 rounded-md ${sortBy === "name" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
+              className={`w-full text-left py-3 px-4 rounded-md ${sortByParam === "name" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
             >
               Popularity
             </button>
             <button
               onClick={() => handleSortChange("price_asc")}
-              className={`w-full text-left py-3 px-4 rounded-md ${sortBy === "price_asc" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
+              className={`w-full text-left py-3 px-4 rounded-md ${sortByParam === "price_asc" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
             >
               Price: Low to High
             </button>
             <button
               onClick={() => handleSortChange("price_desc")}
-              className={`w-full text-left py-3 px-4 rounded-md ${sortBy === "price_desc" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
+              className={`w-full text-left py-3 px-4 rounded-md ${sortByParam === "price_desc" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
             >
               Price: High to Low
+            </button>
+            <button
+              onClick={() => handleSortChange("createdAt_desc")}
+              className={`w-full text-left py-3 px-4 rounded-md ${sortByParam === "createdAt_desc" ? "bg-purple-600 text-white" : "bg-gray-100"}`}
+            >
+              Newest First
             </button>
           </div>
         </div>
@@ -360,4 +402,3 @@ export default function SearchPage() {
     </Suspense>
   )
 }
-

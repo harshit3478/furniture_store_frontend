@@ -8,36 +8,70 @@ import { OrderSummary } from "./components/OrderSummary"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { CartItemType, LocalCartItemType } from "@/types/product"
 
 export default function Cart() {
   const { cart, localCart, isLoading, error } = useCart()
-  const [displayCart, setDisplayCart] = useState<any[]>([])
+  const [displayCart, setDisplayCart] = useState<LocalCartItemType[] | CartItemType[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
 
   useEffect(() => {
     if (cart.length === 0 && localCart.length > 0) {
       setDisplayCart(localCart)
-      // Auto-select all items initially
-      setSelectedItems(localCart.map((item) => item.id.toString()))
     } else if (cart.length > 0) {
       setDisplayCart(cart)
-      // Auto-select all items initially
-      setSelectedItems(cart.map((item) => item.id.toString()))
     }
   }, [cart, localCart])
 
   // Calculate totals for selected items only
   const total = displayCart
-    .filter((item) => selectedItems.includes(item.id))
-    .reduce((sum, item) => sum + item.product.price * item.quantity, 0)
-  const gst = total * 0.18
-  const deliveryFee = total > 0 ? 499 : 0
+    .filter((item) => selectedItems.includes(item.id.toString()))
+    .reduce((sum, item) => {
+      const itemPrice = item.total 
+      return sum + itemPrice;
+    }, 0)
+  const gst = total * 0.00
+  const deliveryFee = displayCart
+    .filter((item) => selectedItems.includes(item.id.toString()))
+    .reduce((maxFee, item) => {
+      const itemDeliveryFee = item.product.deliveryFee * item.quantity;
+      return Math.max(maxFee, itemDeliveryFee);
+    }, 0);
+
+  // Calculate discount amount if coupon is applied
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0
+
+  // Calculate grand total (before discount)
   const grandTotal = total + gst + deliveryFee
 
+  // Calculate final total (after discount)
+  const finalTotal = grandTotal - discountAmount
+  console.log(finalTotal)
+
   const toggleItemSelection = (itemId: string) => {
-    setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]))
+    setSelectedItems((prev) => {
+      const newSelection = prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId];
+      // Store selected items in localStorage
+      localStorage.setItem('selectedCartItems', JSON.stringify(newSelection));
+      return newSelection;
+    });
   }
+
+  // Initialize selected items from localStorage if available
+  useEffect(() => {
+    const storedSelection = localStorage.getItem('selectedCartItems');
+    if (storedSelection) {
+      try {
+        const parsedSelection = JSON.parse(storedSelection);
+        setSelectedItems(parsedSelection);
+      } catch (error) {
+        console.error('Error parsing stored selection:', error);
+        localStorage.removeItem('selectedCartItems');
+      }
+    }
+  }, [])
 
   if (displayCart.length === 0 && !isLoading && !error && localCart.length === 0) {
     return (
@@ -58,8 +92,8 @@ export default function Cart() {
             <CartItem
               key={item.id}
               item={item}
-              isSelected={selectedItems.includes(item.id)}
-              onSelect={() => toggleItemSelection(item.id)}
+              isSelected={selectedItems.includes(item.id.toString())}
+              onSelect={() => toggleItemSelection(item.id.toString())}
             />
           ))}
         </div>
@@ -72,6 +106,7 @@ export default function Cart() {
             deliveryFee={deliveryFee}
             grandTotal={grandTotal}
             selectedItemsCount={selectedItems.length}
+            onCouponApplied={setAppliedCoupon}
           />
         </div>
       </div>
@@ -100,6 +135,7 @@ export default function Cart() {
               deliveryFee={deliveryFee}
               grandTotal={grandTotal}
               selectedItemsCount={selectedItems.length}
+              onCouponApplied={setAppliedCoupon}
               isMobile
             />
           </ScrollArea>

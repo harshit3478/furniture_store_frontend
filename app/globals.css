@@ -12,7 +12,7 @@
     --popover-foreground: 0 0% 3.9%;
     --primary: 271 70% 41%; 
     --primary-foreground : 0 0% 98%;
-    --primary-background: 0% 40% 90%;
+    --primary-background: 270 100% 97%;
     --secondary: 25% 0% 97%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
@@ -96,4 +96,15 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hide scrollbar in Chrome, Safari, and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar in IE, Edge, and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

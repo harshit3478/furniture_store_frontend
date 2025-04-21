@@ -5,6 +5,8 @@ import { useToast } from "@/components/ui/use-toast"
 import type { ProductType } from "@/types/product"
 import { useEffect, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
+import { ChevronRight } from "lucide-react"
 
 async function getBestSellers(): Promise<ProductType[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`, {
@@ -44,11 +46,20 @@ export function BestsellersSection() {
   return (
     <section className="py-6 px-4 md:py-8 md:px-8 w-full">
       <div className="container px-0 mx-auto">
-        <div className="mb-4 md:mb-6">
-          <h2 className="text-xl md:text-2xl font-bold">Weekly Bestsellers</h2>
-          <p className="text-sm text-muted-foreground">Checkout what&apos;s hot in the market!</p>
+        <div className="flex justify-between items-center mb-4 md:mb-6">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold">Weekly Bestsellers</h2>
+            <p className="text-sm text-muted-foreground">Checkout what&apos;s hot in the market!</p>
+          </div>
+          <Link
+            href="/products"
+            className="text-purple-700 hover:text-purple-900 text-sm font-medium flex items-center gap-1"
+          >
+            View All
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
           {isLoading
             ? Array.from({ length: 4 }).map((_, index) => <ProductCardSkeleton key={index} />)
             : products.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} />)}

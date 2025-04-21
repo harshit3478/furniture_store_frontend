@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Star, StarHalf, Minus, Plus } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Star, StarHalf, Minus, Plus, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import type { ProductType } from "@/types/product"
 import AddToCartButton from "./AddToCartButton"
@@ -14,7 +13,24 @@ interface ProductDetailsProps {
 
 export function ProductDetails({ product }: ProductDetailsProps) {
   const [quantity, setQuantity] = useState(1)
-  const [months, setMonths] = useState(3)
+  const [months, setMonths] = useState(12) // Default to 12 months
+  const [currentPrice, setCurrentPrice] = useState(0)
+
+  // Calculate the current price based on the selected duration
+  useEffect(() => {
+    if (product.websitePrices) {
+      if (months === 6) {
+        setCurrentPrice(product.websitePrices.sixMonths || 0)
+      } else if (months === 9) {
+        setCurrentPrice(product.websitePrices.nineMonths || 0)
+      } else if (months === 12) {
+        setCurrentPrice(product.websitePrices.twelveMonths || 0)
+      }
+    } else if (product.price) {
+      // Fallback to the old price field if websitePrices is not available
+      setCurrentPrice(product.price)
+    }
+  }, [months, product])
 
   const decreaseQuantity = () => {
     if (quantity > 1) {
@@ -26,43 +42,101 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     setQuantity(quantity + 1)
   }
 
+  // Calculate delivery date based on delivery time (in days)
+  const calculateDeliveryDate = (deliveryTime?: string) => {
+    const days = parseInt(deliveryTime || "3");
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + days);
+
+    // Format the date as "Day, Month Date"
+    return deliveryDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
   return (
     <div>
       <div className="mb-4">
-        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 mb-2">
-          Best Seller
-        </Badge>
+        {product.tags?.includes('premium') && (
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 mb-2">
+            Premium
+          </Badge>
+        )}
+        {product.tags?.includes('featured') && (
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 mb-2">
+            Featured
+          </Badge>
+        )}
         <h1 className="text-3xl font-bold">{product.name}</h1>
 
         <div className="flex items-center mt-2">
           <div className="flex text-amber-400">
-            {[...Array(Math.floor(product.rating))].map((_, i) => (
+            {[...Array(Math.floor(product.rating || 0))].map((_, i) => (
               <Star key={i} className="w-4 h-4 fill-current" />
             ))}
-            {product.rating % 1 !== 0 && <StarHalf className="w-4 h-4 fill-current" />}
+            {(product.rating || 0) % 1 !== 0 && <StarHalf className="w-4 h-4 fill-current" />}
           </div>
-          <span className="text-sm ml-2">{product.reviews} reviews</span>
+          <span className="text-sm ml-2">{product.reviewCount || 0} reviews</span>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Badge variant="secondary">{product.category}</Badge>
+          {product.subcategory && <Badge variant="secondary">{product.subcategory}</Badge>}
+          <Badge variant="outline">{product.condition}</Badge>
         </div>
       </div>
 
       <div className="mb-6">
         <div className="flex items-baseline">
-          <span className="text-2xl font-bold text-purple-800">₹{product.price}</span>
+          <span className="text-2xl font-bold text-purple-800">₹{currentPrice}</span>
           <span className="text-gray-600 ml-1">/month</span>
         </div>
 
-        <div className="mt-4">
-          <p className="text-sm mb-2">How many months would you like to rent this?</p>
-          <Slider
-            defaultValue={[3]}
-            max={12}
-            min={1}
-            step={1}
-            onValueChange={(value) => setMonths(value[0])}
-            className="max-w-md"
-          />
-          <div className="flex justify-end mt-1 text-sm text-gray-600">
-            <span>{months} Months</span>
+        <p className="text-sm text-gray-500 mt-1">
+          Total for {months} months: ₹{(currentPrice * months).toLocaleString()}
+        </p>
+
+        <div className="mt-6">
+          <p className="text-sm font-medium mb-3">Select rental duration:</p>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div
+              className={`border rounded-md p-3 cursor-pointer transition-all ${months === 6 ? 'border-purple-500 bg-purple-50' : 'hover:border-gray-400'}`}
+              onClick={() => setMonths(6)}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">6 Months</span>
+                {months === 6 && <Check className="h-4 w-4 text-purple-600" />}
+              </div>
+              <div className="text-lg font-bold">₹{product.websitePrices?.sixMonths || 0}<span className="text-sm font-normal text-gray-500">/mo</span></div>
+              <p className="text-xs text-gray-500 mt-1">Best value for short-term</p>
+            </div>
+
+            <div
+              className={`border rounded-md p-3 cursor-pointer transition-all ${months === 9 ? 'border-purple-500 bg-purple-50' : 'hover:border-gray-400'}`}
+              onClick={() => setMonths(9)}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">9 Months</span>
+                {months === 9 && <Check className="h-4 w-4 text-purple-600" />}
+              </div>
+              <div className="text-lg font-bold">₹{product.websitePrices?.nineMonths || 0}<span className="text-sm font-normal text-gray-500">/mo</span></div>
+              <p className="text-xs text-gray-500 mt-1">Most popular choice</p>
+            </div>
+
+            <div
+              className={`border rounded-md p-3 cursor-pointer transition-all ${months === 12 ? 'border-purple-500 bg-purple-50' : 'hover:border-gray-400'}`}
+              onClick={() => setMonths(12)}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium">12 Months</span>
+                {months === 12 && <Check className="h-4 w-4 text-purple-600" />}
+              </div>
+              <div className="text-lg font-bold">₹{product.websitePrices?.twelveMonths || 0}<span className="text-sm font-normal text-gray-500">/mo</span></div>
+              <p className="text-xs text-gray-500 mt-1">Best long-term value</p>
+            </div>
           </div>
         </div>
       </div>
@@ -80,9 +154,29 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <span className="text-sm">Quantity</span>
       </div>
 
+      {/* Product Specifications */}
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        <div className="border rounded-md p-4">
+          <h3 className="text-sm text-gray-500">Size:</h3>
+          <p className="text-sm">{product.size || "Not specified"}</p>
+        </div>
+        <div className="border rounded-md p-4">
+          <h3 className="text-sm text-gray-500">Material:</h3>
+          <p className="text-sm">{product.material || "Not specified"}</p>
+        </div>
+        <div className="border rounded-md p-4">
+          <h3 className="text-sm text-gray-500">Delivery Fee:</h3>
+          <p className="text-sm">₹{product.deliveryFee || 0}</p>
+        </div>
+        <div className="border rounded-md p-4">
+          <h3 className="text-sm text-gray-500">Delivered By:</h3>
+          <p className="text-sm">{calculateDeliveryDate(product.deliveryTime)}</p>
+        </div>
+      </div>
+
       {/* Desktop Action Buttons */}
       <div className="hidden md:flex flex-col space-y-3">
-        <AddToCartButton product={product}  duration={months}/>
+        <AddToCartButton product={product} duration={months} isProductPage={true} quantity={quantity}/>
         <Button variant="outline" className="w-full">
           Rent Now
         </Button>
@@ -90,8 +184,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Mobile Fixed Bottom Buttons */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 grid grid-cols-2 gap-0.5 bg-white border-t z-50">
-        <AddToCartButton product={product}  className="py-4 px-4 bg-primary text-white font-medium text-md rounded-none" duration={months}/>
-        
+        <AddToCartButton product={product} className="py-4 px-4 bg-primary text-white font-medium text-md rounded-none" duration={months} isProductPage={true} quantity={quantity}/>
+
         <button onClick={() => {}} className="py-4 px-4 bg-primary text-white font-medium text-md border-l">
           Rent Now
         </button>

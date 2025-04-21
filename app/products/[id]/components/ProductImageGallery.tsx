@@ -9,7 +9,9 @@ interface ProductImageGalleryProps {
 }
 
 export function ProductImageGallery({ images, name }: ProductImageGalleryProps) {
-  const [mainImage, setMainImage] = useState(images[0])
+  // Make sure we have at least one image
+  const validImages = images.filter(img => img);
+  const [mainImage, setMainImage] = useState(validImages.length > 0 ? validImages[0] : "/placeholder.svg")
 
   return (
     <div className="flex flex-col-reverse md:flex-row gap-4">

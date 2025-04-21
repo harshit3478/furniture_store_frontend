@@ -52,7 +52,15 @@ export default function AuthCallback() {
             }
             window.localStorage.removeItem("emailForSignIn"); // Clean up
             toast.success("Signed in successfully!");
-            router.push("/"); // Adjust redirect as needed
+
+            // Check if there's a redirect URL saved in localStorage
+            const redirectUrl = window.localStorage.getItem("redirectAfterLogin");
+            if (redirectUrl) {
+              window.localStorage.removeItem("redirectAfterLogin"); // Clean up
+              router.push(redirectUrl);
+            } else {
+              router.push("/"); // Default redirect to home
+            }
           }
         } catch (error) {
           console.error("Error signing in:", error);

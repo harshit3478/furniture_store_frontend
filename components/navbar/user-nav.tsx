@@ -68,20 +68,20 @@ export function UserNav({ user }: UserNavProps) {
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/account" className="flex items-center">
+                <Link href="/profile" className="flex items-center">
                   <UserIcon className="mr-2 h-4 w-4" />
                   My Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/orders" className="flex items-center">
+                <Link href="/profile/orders" className="flex items-center">
                   <ShoppingCart className="mr-2 h-4 w-4" />
                   My Orders
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
-                <LogIn className="mr-2 h-4 w-4" />
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
+                <LogIn className="mr-2 h-4 w-4"  />
                 Log out
               </DropdownMenuItem>
             </>

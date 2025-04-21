@@ -76,8 +76,8 @@ const ProfileCard: FC<ProfileCardProps> = ({
         <div className="flex items-start">
           <div className="text-2xl mr-3">{icon}</div>
           <div>
-            <h3 className="font-medium text-lg">{title}</h3>
-            <p className="text-gray-500 text-sm">{description}</p>
+            <h3 className="font-medium text-md ">{title}</h3>
+            <p className="text-gray-500 text-sm sm:hidden">{description}</p>
           </div>
         </div>
       </Card>

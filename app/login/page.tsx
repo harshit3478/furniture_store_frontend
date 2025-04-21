@@ -75,7 +75,15 @@ export default function Login() {
           return
         }
         toast.success("Signed in successfully!")
-        router.push("/")
+
+        // Check if there's a redirect URL saved in localStorage
+        const redirectUrl = window.localStorage.getItem("redirectAfterLogin")
+        if (redirectUrl) {
+          window.localStorage.removeItem("redirectAfterLogin") // Clean up
+          router.push(redirectUrl)
+        } else {
+          router.push("/") // Default redirect to home
+        }
       } else {
         throw new Error("Failed to register user")
       }
@@ -155,12 +163,7 @@ export default function Login() {
               Sign in with Google
             </Button>
 
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Don&apos;t you have an account? </span>
-              <Link href="/signup" className="text-primary font-medium hover:underline">
-                Sign up
-              </Link>
-            </div>
+            
           </Card>
 
           <p className="mt-10 text-center text-xs text-muted-foreground">© 2023 All Rights Reserved</p>
@@ -175,4 +178,3 @@ export default function Login() {
     </div>
   )
 }
-

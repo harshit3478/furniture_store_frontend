@@ -11,6 +11,7 @@ import { ProductSkeleton } from "./components/ProductSkeleton"
 import { useToast } from "@/components/ui/use-toast"
 import { Reviews } from "./components/Reviews"
 import { SimilarProducts } from "./components/SimilarProduct"
+import { Badge } from "@/components/ui/badge";
 
 async function getProduct(id: string): Promise<ProductType> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${id}`, {
@@ -96,7 +97,10 @@ export default function ProductPage() {
 
       <div className="max-w-7xl mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <ProductImageGallery images={[product.image]} name={product.name} />
+          <ProductImageGallery
+            images={[product.heroImage, ...product.images]}
+            name={product.name}
+          />
           <ProductDetails product={product} />
         </div>
 
@@ -104,20 +108,22 @@ export default function ProductPage() {
         <div className="mt-12 grid md:grid-cols-2 gap-8">
           <div>
             <h2 className="text-xl font-semibold mb-4">Product Description:</h2>
-            <p className="text-gray-700">
-              Buy the Flo 3-Seater Sofa - A couch for three. The Flo 3-Seater Sofa is a comfortable, upholstered fixed
-              back sofa that sits pretty for both, looks and comfort. Designed to sit on while you tune in to your next
-              binge series, it adds value to every room it&apos;s placed in.
-            </p>
+            <div className="text-gray-700 whitespace-pre-line">
+              {product.description || "No description available for this product."}
+            </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="border rounded-md p-4">
-                <h3 className="text-sm text-gray-500">Size :</h3>
-                <p className="text-sm">30 x 60 x 100 (in inches)</p>
-              </div>
-              <div className="border rounded-md p-4">
-                <h3 className="text-sm text-gray-500">Material:</h3>
-                <p className="text-sm">Mahogany Wood</p>
+            <div className="mt-6">
+              <h3 className="text-md font-medium mb-2">Tags:</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.tags && product.tags.length > 0 ? (
+                  product.tags.map((tag, index) => (
+                    <Badge key={index} variant="outline" className="px-2 py-1">
+                      {tag}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-gray-500 text-sm">No tags</span>
+                )}
               </div>
             </div>
           </div>
@@ -139,10 +145,10 @@ export default function ProductPage() {
 
         {/* Similar Products */}
         <SimilarProducts />
-        
+
         {/* Reviews Section */}
         <Reviews />
-       
+
       </div>
     </div>
   )

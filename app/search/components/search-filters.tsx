@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -20,16 +20,25 @@ export default function SearchFilters({
   onCategoryChange,
   priceRange,
   onPriceChange,
+ 
 }: SearchFiltersProps) {
   const [minPrice, setMinPrice] = useState(priceRange[0])
   const [maxPrice, setMaxPrice] = useState(priceRange[1])
 
+  // Update local state when props change (from URL parameters)
+  useEffect(() => {
+    setMinPrice(priceRange[0])
+    setMaxPrice(priceRange[1])
+  }, [priceRange])
+
+  // Categories matching backend schema
   const categories = [
-    { id: "beds", label: "Beds" },
-    { id: "mattresses", label: "Mattresses" },
-    { id: "nightstands", label: "Night Stands" },
-    { id: "dressers", label: "Dressers" },
-    { id: "art", label: "Art" },
+    { id: "bed-room", label: "Bed Room" },
+    { id: "living-room", label: "Living Room" },
+    { id: "dining-room", label: "Dining Room" },
+    { id: "office", label: "Office" },
+    { id: "kids-room", label: "Kids Room" },
+    { id: "outdoor", label: "Outdoor" },
   ]
 
   const colors = [
@@ -88,9 +97,9 @@ export default function SearchFilters({
         <h3 className="font-medium text-purple-700">Price</h3>
         <div className="pt-2 px-1">
           <Slider
-            defaultValue={[minPrice, maxPrice]}
-            max={2000}
-            step={10}
+            value={[minPrice, maxPrice]}
+            max={20000}
+            step={100}
             onValueChange={(values) => {
               handlePriceInputChange(values[0], values[1])
             }}
@@ -165,8 +174,12 @@ export default function SearchFilters({
       </div>
 
       {/* Apply Filter Button - Desktop only */}
-      <button className="w-full bg-purple-700 text-white py-2 rounded-md hidden lg:block">Apply filter</button>
+      <button 
+        className="w-full bg-purple-700 text-white py-2 rounded-md hidden lg:block"
+        onClick={() => onPriceChange([minPrice, maxPrice])}
+      >
+        Apply filter
+      </button>
     </div>
   )
 }
-
