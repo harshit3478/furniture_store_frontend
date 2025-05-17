@@ -12,21 +12,21 @@ export enum OrderStatus {
     Cancelled = "Cancelled",
     Returned = "Returned"
   }
-  
+
   export enum PaymentStatus {
     Pending = "Pending",
     Completed = "Completed",
     Failed = "Failed",
     Refunded = "Refunded"
   }
-  
+
   export enum PaymentMethod {
     Razorpay = "Razorpay",
     COD = "COD",
     BankTransfer = "BankTransfer"
   }
-  
- 
+
+
   export interface OrderItem {
     id: string;
     productId: string;
@@ -40,8 +40,8 @@ export enum OrderStatus {
     vendorId?: string;
     product: ProductType;
   }
- 
-  
+
+
   export interface Order {
     id: string;
     orderNumber: string;
@@ -60,7 +60,7 @@ export enum OrderStatus {
     orderItems: OrderItem[];
     userId: string;
   }
-  
+
   export interface OrderSummary {
     id: string;
     orderNumber: string;
@@ -70,5 +70,11 @@ export enum OrderStatus {
     itemCount: number;
     mainProductImage: string;
     mainProductName: string;
-    rentedFor :number;
+    rentedFor: number;
+    paymentStatus?: string;
+    products?: Array<{
+      id: string;
+      name: string;
+      image: string;
+    }>;
   }

@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { StarIcon } from "@/components/ui/star-icon"
 
 interface SearchFiltersProps {
   selectedCategories: string[]
@@ -13,6 +14,12 @@ interface SearchFiltersProps {
   onPriceChange: (range: [number, number]) => void
   sortBy: string
   onSortChange: (sort: string) => void
+  selectedConditions?: string[]
+  onConditionChange?: (conditions: string[]) => void
+  selectedMaterials?: string[]
+  onMaterialChange?: (materials: string[]) => void
+  minRating?: number
+  onRatingChange?: (rating: number) => void
 }
 
 export default function SearchFilters({
@@ -20,7 +27,14 @@ export default function SearchFilters({
   onCategoryChange,
   priceRange,
   onPriceChange,
- 
+  sortBy,
+  onSortChange,
+  selectedConditions = [],
+  onConditionChange = () => {},
+  selectedMaterials = [],
+  onMaterialChange = () => {},
+  minRating = 0,
+  onRatingChange = () => {},
 }: SearchFiltersProps) {
   const [minPrice, setMinPrice] = useState(priceRange[0])
   const [maxPrice, setMaxPrice] = useState(priceRange[1])
@@ -41,24 +55,51 @@ export default function SearchFilters({
     { id: "outdoor", label: "Outdoor" },
   ]
 
-  const colors = [
-    { id: "black", label: "Black" },
-    { id: "brown", label: "Brown" },
-    { id: "beige", label: "Beige" },
-    { id: "grey", label: "Grey" },
+  // Conditions from the Prisma schema Condition enum
+  const conditions = [
+    { id: "Excellent", label: "Excellent" },
+    { id: "Good", label: "Good" },
+    { id: "Fair", label: "Fair" },
+    { id: "New", label: "New" },
+    { id: "Used", label: "Used" },
+    { id: "Refurbished", label: "Refurbished" },
+    { id: "LikeNew", label: "Like New" },
   ]
 
+  // Materials from the Prisma schema
   const materials = [
     { id: "wood", label: "Wood" },
     { id: "metal", label: "Metal" },
     { id: "ceramics", label: "Ceramics" },
+    { id: "glass", label: "Glass" },
+    { id: "plastic", label: "Plastic" },
+    { id: "fabric", label: "Fabric" },
   ]
+
+  // Rating options
+  const ratingOptions = [1, 2, 3, 4, 5]
 
   const handleCategoryChange = (category: string) => {
     if (selectedCategories.includes(category)) {
       onCategoryChange(selectedCategories.filter((c) => c !== category))
     } else {
       onCategoryChange([...selectedCategories, category])
+    }
+  }
+
+  const handleConditionChange = (condition: string) => {
+    if (selectedConditions.includes(condition)) {
+      onConditionChange(selectedConditions.filter((c) => c !== condition))
+    } else {
+      onConditionChange([...selectedConditions, condition])
+    }
+  }
+
+  const handleMaterialChange = (material: string) => {
+    if (selectedMaterials.includes(material)) {
+      onMaterialChange(selectedMaterials.filter((m) => m !== material))
+    } else {
+      onMaterialChange([...selectedMaterials, material])
     }
   }
 
@@ -143,15 +184,19 @@ export default function SearchFilters({
         </div>
       </div>
 
-      {/* Color */}
+      {/* Condition */}
       <div className="space-y-3">
-        <h3 className="font-medium text-purple-700">Colour</h3>
+        <h3 className="font-medium text-purple-700">Condition</h3>
         <div className="space-y-2">
-          {colors.map((color) => (
-            <div key={color.id} className="flex items-center space-x-2">
-              <Checkbox id={`color-${color.id}`} />
-              <Label htmlFor={`color-${color.id}`} className="text-sm font-normal cursor-pointer">
-                {color.label}
+          {conditions.map((condition) => (
+            <div key={condition.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`condition-${condition.id}`}
+                checked={selectedConditions.includes(condition.id)}
+                onCheckedChange={() => handleConditionChange(condition.id)}
+              />
+              <Label htmlFor={`condition-${condition.id}`} className="text-sm font-normal cursor-pointer">
+                {condition.label}
               </Label>
             </div>
           ))}
@@ -164,7 +209,11 @@ export default function SearchFilters({
         <div className="space-y-2">
           {materials.map((material) => (
             <div key={material.id} className="flex items-center space-x-2">
-              <Checkbox id={`material-${material.id}`} />
+              <Checkbox
+                id={`material-${material.id}`}
+                checked={selectedMaterials.includes(material.id)}
+                onCheckedChange={() => handleMaterialChange(material.id)}
+              />
               <Label htmlFor={`material-${material.id}`} className="text-sm font-normal cursor-pointer">
                 {material.label}
               </Label>
@@ -173,8 +222,34 @@ export default function SearchFilters({
         </div>
       </div>
 
+      {/* Rating */}
+      <div className="space-y-3">
+        <h3 className="font-medium text-purple-700">Minimum Rating</h3>
+        <div className="flex items-center space-x-2">
+          {ratingOptions.map((rating) => (
+            <button
+              key={rating}
+              onClick={() => onRatingChange(rating)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                minRating === rating ? 'bg-purple-600 text-white' : 'bg-gray-100'
+              }`}
+            >
+              {rating}
+            </button>
+          ))}
+          {minRating > 0 && (
+            <button
+              onClick={() => onRatingChange(0)}
+              className="text-xs text-purple-700 ml-2"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Apply Filter Button - Desktop only */}
-      <button 
+      <button
         className="w-full bg-purple-700 text-white py-2 rounded-md hidden lg:block"
         onClick={() => onPriceChange([minPrice, maxPrice])}
       >

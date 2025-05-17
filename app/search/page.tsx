@@ -10,58 +10,89 @@ import { ProductType } from "@/types/product"
 function SearchPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   // Read all query parameters
   const query = searchParams.get("query")?.toLowerCase() || ""
   const categoriesParam = searchParams.get("categories") || searchParams.get("category") || ""
   const minPriceParam = searchParams.get("minPrice") || "0"
   const maxPriceParam = searchParams.get("maxPrice") || "2000"
   const sortByParam = searchParams.get("sortBy") || "name"
-  
-  // Parse category parameters
+  const conditionsParam = searchParams.get("conditions") || ""
+  const materialsParam = searchParams.get("materials") || ""
+  const minRatingParam = searchParams.get("minRating") || "0"
+
+  // Parse parameters
   const categories = categoriesParam ? categoriesParam.split(",") : []
-  
-  // Parse price parameters
+  const conditions = conditionsParam ? conditionsParam.split(",") : []
+  const materials = materialsParam ? materialsParam.split(",") : []
+
+  // Parse numeric parameters
   const minPrice = parseInt(minPriceParam, 10)
   const maxPrice = parseInt(maxPriceParam, 10)
-  
+  const minRating = parseFloat(minRatingParam)
+
   const [products, setProducts] = useState<ProductType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [showSortOptions, setShowSortOptions] = useState(false)
 
   // Update URL when filters change
-  const updateFilters = (newCategories: string[], newPriceRange: [number, number], newSortBy: string) => {
+  const updateFilters = (
+    newCategories: string[] = categories,
+    newPriceRange: [number, number] = [minPrice, maxPrice],
+    newSortBy: string = sortByParam,
+    newConditions: string[] = conditions,
+    newMaterials: string[] = materials,
+    newMinRating: number = minRating
+  ) => {
     // Create a new URLSearchParams object
     const params = new URLSearchParams(searchParams.toString())
-    
+
     // Update parameters
     if (newCategories.length > 0) {
       params.set("categories", newCategories.join(","))
     } else {
       params.delete("categories")
     }
-    
+
+    if (newConditions.length > 0) {
+      params.set("conditions", newConditions.join(","))
+    } else {
+      params.delete("conditions")
+    }
+
+    if (newMaterials.length > 0) {
+      params.set("materials", newMaterials.join(","))
+    } else {
+      params.delete("materials")
+    }
+
+    if (newMinRating > 0) {
+      params.set("minRating", newMinRating.toString())
+    } else {
+      params.delete("minRating")
+    }
+
     params.set("minPrice", newPriceRange[0].toString())
     params.set("maxPrice", newPriceRange[1].toString())
     params.set("sortBy", newSortBy)
-    
+
     // Keep the query parameter if it exists
     if (query) {
       params.set("query", query)
     }
-    
+
     // Update URL without refreshing page
     router.push(`/search?${params.toString()}`)
   }
 
   // Handlers for filter changes
   const handleCategoryChange = (newCategories: string[]) => {
-    updateFilters(newCategories, [minPrice, maxPrice], sortByParam)
+    updateFilters(newCategories)
   }
 
   const handlePriceChange = (newRange: [number, number]) => {
-    updateFilters(categories, newRange, sortByParam)
+    updateFilters(categories, newRange)
   }
 
   const handleSortChange = (sort: string) => {
@@ -69,6 +100,18 @@ function SearchPageContent() {
       updateFilters(categories, [minPrice, maxPrice], sort)
       setShowSortOptions(false) // Close sort options after selection
     }
+  }
+
+  const handleConditionChange = (newConditions: string[]) => {
+    updateFilters(categories, [minPrice, maxPrice], sortByParam, newConditions)
+  }
+
+  const handleMaterialChange = (newMaterials: string[]) => {
+    updateFilters(categories, [minPrice, maxPrice], sortByParam, conditions, newMaterials)
+  }
+
+  const handleRatingChange = (newRating: number) => {
+    updateFilters(categories, [minPrice, maxPrice], sortByParam, conditions, materials, newRating)
   }
 
   // Fetch products from PostgreSQL via API
@@ -85,14 +128,26 @@ function SearchPageContent() {
         params.append("categories", categories.join(","))
       }
 
+      if (conditions.length > 0) {
+        params.append("conditions", conditions.join(","))
+      }
+
+      if (materials.length > 0) {
+        params.append("materials", materials.join(","))
+      }
+
+      if (minRating > 0) {
+        params.append("minRating", minRating.toString())
+      }
+
       console.log(`Fetching products with URL: ${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params.toString()}`)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?${params}`)
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch products")
       }
-      
+
       const result = await response.json()
       console.log("API Response:", result)
       setProducts(result as ProductType[])
@@ -152,6 +207,12 @@ function SearchPageContent() {
               onPriceChange={handlePriceChange}
               sortBy={sortByParam}
               onSortChange={handleSortChange}
+              selectedConditions={conditions}
+              onConditionChange={handleConditionChange}
+              selectedMaterials={materials}
+              onMaterialChange={handleMaterialChange}
+              minRating={minRating}
+              onRatingChange={handleRatingChange}
             />
           </div>
 
@@ -294,6 +355,12 @@ function SearchPageContent() {
               onPriceChange={handlePriceChange}
               sortBy={sortByParam}
               onSortChange={handleSortChange}
+              selectedConditions={conditions}
+              onConditionChange={handleConditionChange}
+              selectedMaterials={materials}
+              onMaterialChange={handleMaterialChange}
+              minRating={minRating}
+              onRatingChange={handleRatingChange}
             />
           </div>
           <div className="mt-6 sticky bottom-0 bg-background pt-2 pb-4">

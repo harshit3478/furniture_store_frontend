@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Clock, XCircle } from "lucide-react";
+import { ReviewForm } from "./ReviewForm";
 
 interface OrderItemProps {
   order: {
@@ -20,6 +21,12 @@ interface OrderItemProps {
     orderDate: string;
     orderNumber: string;
     status?: string;
+    itemCount?: number;
+    products?: Array<{
+      id: string;
+      name: string;
+      image: string;
+    }>;
   };
 }
 
@@ -128,10 +135,12 @@ export const OrderItem: FC<OrderItemProps> = ({ order }) => {
                   View Details
                 </Button>
               </Link>
-              {order.status === "Paid" && (
-                <Button className="bg-secondary hover:bg-secondary/90 text-white w-full md:w-auto">
-                  Extend Rental
-                </Button>
+              {order.status === "Delivered" && (
+                <ReviewForm
+                  productId={order.product?.id || ''}
+                  productName={order.product?.name || 'Product'}
+                  products={order.products}
+                />
               )}
             </div>
           </div>

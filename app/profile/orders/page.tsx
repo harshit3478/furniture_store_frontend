@@ -106,14 +106,14 @@ const MyOrdersPage: FC = () => {
                 status: order.status,
                 orderDate: formatDate(order.createdAt),
                 product: {
-                  id: '',
+                  id: order.products?.[0]?.id || '',
                   name: order.mainProductName,
                   price: order.totalAmount,
                   image: order.mainProductImage,
                 },
                 rentedFor: order.rentedFor,
-                // @ts-expect-error - itemCount is used in the component
-                itemCount: order.itemCount
+                itemCount: order.itemCount,
+                products: order.products
               }}
             />
           ))

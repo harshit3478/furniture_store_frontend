@@ -26,6 +26,7 @@ import {
 import Link from "next/link"
 import { type Order, OrderStatus } from "@/types/orders"
 import { Separator } from "@/components/ui/separator"
+import { ReviewForm } from "../../components/ReviewForm"
 
 export default function OrderDetailsPage() {
   const { id } = useParams()
@@ -560,8 +561,19 @@ export default function OrderDetailsPage() {
 
                   {/* Action buttons */}
                   <div className="mt-8 space-y-3">
-                    {order.status === OrderStatus.Delivered && (
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">Extend Rental</Button>
+                    {order.status === OrderStatus.Delivered && order.orderItems.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-sm font-medium mb-2">Write a Review</h3>
+                        <ReviewForm
+                          productId={order.orderItems[0].productId || ''}
+                          productName={order.orderItems[0].product?.name || 'Product'}
+                          products={order.orderItems.map(item => ({
+                            id: item.productId,
+                            name: item.product?.name || 'Product',
+                            image: item.product?.image
+                          }))}
+                        />
+                      </div>
                     )}
 
                     {(order.status === OrderStatus.Pending || order.status === OrderStatus.PaymentPending) && (
