@@ -59,6 +59,8 @@ module.exports = {
 		fontFamily : {
 			gilroy : ["var(--font-gilroy)"],
 			roboto : ["var(--font-roboto)"],
+			gilroySemibold : ["var(--font-gilroy-semibold)"],
+			gilroyMedium : ["var(--font-gilroy-medium)"]
 		}
   	}
   },

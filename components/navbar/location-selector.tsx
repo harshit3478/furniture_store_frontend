@@ -1,8 +1,6 @@
 "use client"
-
 import * as React from "react"
 import { Check, ChevronsUpDown, MapPin } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -25,7 +23,7 @@ export function LocationSelector() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="h-9 px-2 text-sm border-gray-200">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="h-9 px-2 text-base font-gilroyMedium text-gray-500 border-gray-200">
           <div className="flex items-center gap-1">
             <MapPin className="h-4 w-4 text-gray-500" />
             <span className="hidden md:inline">{selectedLocation.label}</span>
@@ -35,12 +33,13 @@ export function LocationSelector() {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search location..." />
+          <CommandInput placeholder="Search location..."/>
           <CommandList>
             <CommandEmpty>No location found.</CommandEmpty>
             <CommandGroup>
               {locations.map((location) => (
-                <CommandItem
+                <CommandItem 
+                  className="font-gilroyMedium text-base hover:bg-[#E5DFFE] data-[highlighted]:bg-[#E5DFFE] aria-selected:bg-[#E5DFFE]"
                   key={location.value}
                   value={location.value}
                   onSelect={() => {
@@ -50,7 +49,7 @@ export function LocationSelector() {
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 font-gilroySemibold",
                       selectedLocation.value === location.value ? "opacity-100" : "opacity-0",
                     )}
                   />
@@ -64,4 +63,3 @@ export function LocationSelector() {
     </Popover>
   )
 }
-

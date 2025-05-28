@@ -87,7 +87,11 @@ export function Footer() {
           </div>
 
           <div className="flex items-center justify-center md:justify-end">
-            <div className="text-3xl font-bold">Logo</div>
+            <Link href="/" className="flex items-center">
+              <div className="h-[80px]">
+                <img src="/logo.svg" className="w-full h-full object-fill" alt="Logo" />
+              </div>
+            </Link>
           </div>
         </div>
 

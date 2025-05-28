@@ -19,7 +19,7 @@ interface OfferCardProps {
 export function OfferCard({ offer }: OfferCardProps) {
   return (
     <motion.div
-      className={`relative p-6 rounded-lg ${offer.color}`}
+      className={`relative p-6 rounded-lg ${offer.color} `}
       style={{
         backgroundImage: `url('/home/offers/coupon1.svg')`,
         backgroundSize: "cover",

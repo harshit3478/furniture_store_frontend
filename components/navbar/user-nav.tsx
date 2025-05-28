@@ -1,10 +1,8 @@
 "use client"
-
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { User } from "firebase/auth"
 import { ShoppingCart, UserIcon, LogIn, Heart } from "lucide-react"
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -35,27 +33,25 @@ export function UserNav({ user }: UserNavProps) {
   return (
     <div className="flex items-center gap-1 md:gap-2">
       <Link href="/wishlist">
-        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Wishlist">
-          <Heart className="h-5 w-5 text-gray-600" />
+        <Button variant="ghost" size="icon" className="h-10 w-10" aria-label="Wishlist">
+          <Heart className="h-10 w-10 text-gray-500" />
         </Button>
       </Link>
-
       <Link href="/cart">
-        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Cart">
-          <ShoppingCart className="h-5 w-5 text-gray-600" />
+        <Button variant="ghost" size="icon" className="h-10 w-10" aria-label="Cart">
+          <ShoppingCart className="h-6 w-6 text-gray-500" />
         </Button>
       </Link>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" aria-label="User menu">
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" aria-label="User menu">
             {user ? (
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-9 w-9">
                 <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
                 <AvatarFallback>{user.displayName?.[0] || "U"}</AvatarFallback>
               </Avatar>
             ) : (
-              <UserIcon className="h-5 w-5 text-gray-600" />
+              <UserIcon className="h-6 w-6 text-gray-500" />
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -69,19 +65,19 @@ export function UserNav({ user }: UserNavProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/profile" className="flex items-center">
-                  <UserIcon className="mr-2 h-4 w-4" />
+                  <UserIcon className="mr-2 h-5 w-5" />
                   My Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/profile/orders" className="flex items-center">
-                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  <ShoppingCart className="mr-2 h-5 w-5" />
                   My Orders
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
-                <LogIn className="mr-2 h-4 w-4"  />
+                <LogIn className="mr-2 h-5 w-5" />
                 Log out
               </DropdownMenuItem>
             </>
@@ -89,7 +85,7 @@ export function UserNav({ user }: UserNavProps) {
             <>
               <DropdownMenuItem asChild>
                 <Link href="/login" className="flex items-center">
-                  <LogIn className="mr-2 h-4 w-4" />
+                  <LogIn className="mr-2 h-5 w-5" />
                   Login
                 </Link>
               </DropdownMenuItem>
@@ -100,4 +96,3 @@ export function UserNav({ user }: UserNavProps) {
     </div>
   )
 }
-

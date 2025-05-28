@@ -65,11 +65,11 @@ const offers: Offer[] = [
 
 export function OffersSection() {
   return (
-    <section className="py-8 px-8 w-full bg-gray-50">
+    <section className="py-8 px-8 w-full bg-[#F7F6FD]">
       <div className="container">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold">Offers</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-3xl font-gilroySemibold mb-2">Offers</h2>
+          <p className="text-muted-foreground text-base">
             Checkout these coupons just for you!
           </p>
         </div>
@@ -81,7 +81,7 @@ export function OffersSection() {
           }}
         >
           {offers.map((offer) => (
-            <SwiperSlide key={offer.id}>
+            <SwiperSlide key={offer.id} className=" rounded-md ">
               <OfferCard offer={offer} />
             </SwiperSlide>
           ))}

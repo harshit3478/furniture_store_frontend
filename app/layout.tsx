@@ -11,6 +11,15 @@ const gilroy = localFont({
   variable: '--font-gilroy',
 });
 
+const gilroySemibold = localFont({
+  src: './../public/fonts/Gilroy-Semibold.ttf',
+  variable: '--font-gilroy-semibold',
+})
+
+const gilroyMedium = localFont({
+  src: './../public/fonts/Gilroy-Medium.ttf',
+  variable: '--font-gilroy-medium',
+})
 
 
 
@@ -26,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${gilroy.className}`}>
+      <body className={`${gilroy.variable} ${gilroySemibold.variable} ${gilroyMedium.variable} font-gilroy`}>
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>

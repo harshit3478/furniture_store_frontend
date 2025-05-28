@@ -39,7 +39,7 @@ export function SearchBar() {
   }
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative ">
       <form onSubmit={handleSearch} className="w-full">
         <div className="relative flex items-center">
           <input
@@ -47,7 +47,7 @@ export function SearchBar() {
             placeholder="Search Chair"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-3 pr-10 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300"
+            className="w-full pl-3 text-base font-gilroyMedium pr-10 py-2 rounded-md border-1 border-gray-300 focus:outline-none ffocus:ring-2 focus:ring-[#E5DFFE] focus:border-[#E5DFFE]"
           />
           <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
             <Search className="h-5 w-5 text-gray-500" />
