@@ -127,9 +127,9 @@ const ProfileSettingsPage: FC = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-2">Profile Settings</h1>
-      <p className="text-gray-500 mb-6">Modify name, email, phone number and addresses</p>
+    <div className="bg-white p-8 rounded-lg border-2 mx-4">
+      <h1 className="text-3xl font-gilroySemibold mb-2">Profile Settings</h1>
+      <p className="text-gray-500 font-gilroy text-base mb-6">Modify name, email, phone number and addresses</p>
 
       <div className="space-y-6">
         {/* Profile Photo */}
@@ -216,7 +216,7 @@ const ProfileSettingsPage: FC = () => {
             <Button
               onClick={handleSaveProfile}
               disabled={isSaving}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-purple-700 hover:bg-purple-800"
             >
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes

@@ -170,7 +170,7 @@ const MyPaymentsPage: FC = () => {
   }
 
   return (
-    <div className="bg-white md:bg-transparent w-full">
+    <div className="bg-white p-8 rounded-lg border-2 mx-4">
       {/* Breadcrumb - Mobile Only */}
       <div className="md:hidden bg-gray-50 py-2 px-4 text-sm text-gray-600 flex items-center overflow-x-auto whitespace-nowrap">
         <Link href="/profile" className="hover:text-gray-900">

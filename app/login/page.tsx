@@ -97,23 +97,22 @@ export default function Login() {
     <div className="min-h-screen bg-slate-50 flex">
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
-          <div className="mb-10">
-            <Link href="/" className="text-2xl font-bold">
-              Logo
-            </Link>
+          <div className="mb-10  flex justify-start">
+            <div className="h-[56px]">
+              <img src="/logo.svg"  className="w-full h-full object-fill" alt="Logo"/>
+            </div>
+            <div className="text-5xl font-gilroySemibold px-4 flex items-center text-purple-700">Furnitures</div>
           </div>
           <div className="mb-10">
-            <h2 className="text-3xl font-bold">Welcome Back 👋</h2>
-            <p className="mt-2 text-muted-foreground">
+            <h2 className="text-3xl font-gilroyMedium">Welcome Back 👋</h2>
+            <p className="mt-2 text-muted-foreground text-base font-gilroyMedium">
               Today is a new day. It&apos;s your day. You shape it.
-              <br />
-              Sign in to continue.
             </p>
           </div>
           <Card className="p-6 shadow-sm border-0">
             <form onSubmit={handleEmailLogin} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="font-gilroyMedium text-lg">Email</Label>
                 <Input
                   id="email"
                   type="email"

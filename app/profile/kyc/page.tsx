@@ -179,7 +179,7 @@ const KycVerificationPage: FC = () => {
   }
 
   return (
-    <div className="bg-white md:bg-transparent">
+    <div className="bg-white p-8 rounded-lg border-2 mx-4">
       {/* Breadcrumb - Mobile Only */}
       <div className="md:hidden bg-gray-50 py-2 px-4 text-sm text-primary flex items-center overflow-x-auto whitespace-nowrap">
         <Link href="/profile" className="hover:text-gray-900">Profile</Link>
@@ -189,14 +189,14 @@ const KycVerificationPage: FC = () => {
 
       {/* Mobile Header */}
       <div className="md:hidden bg-white p-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold">KYC and Verification</h1>
+        <h1 className="text-3xl font-gilroySemibold">KYC and Verification</h1>
         <p className="text-gray-500 text-sm">Upload your KYC documents for verification</p>
       </div>
 
       {/* Desktop Header - Hidden on Mobile */}
       <div className="hidden md:block mb-6">
-        <h1 className="text-2xl font-bold mb-2">KYC and Verification</h1>
-        <p className="text-gray-500">Upload your KYC documents for verification</p>
+        <h1 className="text-3xl font-gilroySemibold mb-2">KYC and Verification</h1>
+        <p className="text-gray-500 font-gilroy text-base mb-6">Upload your KYC documents for verification</p>
       </div>
 
       <Card className="md:shadow-none md:border-0 p-6 md:p-0 bg-transparent ">

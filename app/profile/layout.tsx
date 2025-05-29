@@ -18,7 +18,7 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
     <div>
       <Navbar />
       <main className="min-h-screen bg-primary-background ">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 py-8 px-4 ">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-4 py-8 px-4 ">
           {/* Left Side - Profile Sidebar */}
           <div className="col-span-2 md:border-r md:pr-8 border-gray-200 hidden md:block">
             <ProfileSidebar userName={userName} />

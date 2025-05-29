@@ -62,7 +62,7 @@ const MyOrdersPage: FC = () => {
   };
 
   return (
-    <div className="bg-white md:bg-transparent">
+    <div className="bg-white p-8 rounded-lg border-2 mx-4">
       {/* Breadcrumb - Mobile Only */}
       <div className="md:hidden py-2 px-4 text-sm text-primary flex items-center overflow-x-auto whitespace-nowrap">
         <Link href="/profile" className="hover:text-gray-900">Profile</Link>

@@ -159,11 +159,11 @@ const AddressManager: FC = () => {
         }));
         setFormErrors(prev => ({ ...prev, pincode: undefined }));
       } else {
-        setFormErrors(prev => ({ ...prev, pincode: "Please Provide a valid pincode" }));
+        setFormErrors(prev => ({ ...prev, pincode: "Please provide a valid pincode" }));
       }
     } catch (error) {
       console.error("Error fetching pincode data:", error);
-      setFormErrors(prev => ({ ...prev, pincode: "Please Provide a valid pincode" }));
+      setFormErrors(prev => ({ ...prev, pincode: "Please provide a valid pincode" }));
     }
   };
 
@@ -257,27 +257,28 @@ const AddressManager: FC = () => {
       </div>
 
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
-        <DialogContent>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{isEditingAddress ? "Edit Address" : "Add New Address"}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg">{isEditingAddress ? "Edit Address" : "Add New Address"}</DialogTitle>
+            <DialogDescription className="text-sm text-gray-600">
               Fill in the details for your address
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
               <Input
                 id="fullName"
-                placeholder="Full Name"
+                placeholder="Enter full name"
                 value={currentAddress?.fullName || ""}
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, fullName: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Mobile Number</Label>
+            <div>
+              <Label htmlFor="phoneNumber" className="text-sm font-medium">Mobile Number</Label>
               <Input
                 id="phoneNumber"
                 placeholder="10-digit mobile number"
@@ -290,45 +291,48 @@ const AddressManager: FC = () => {
                     phoneNumber: value.length !== 10 && value ? "Mobile number must be 10 digits" : undefined
                   }));
                 }}
+                className="mt-1"
               />
               {formErrors.phoneNumber && (
-                <p className="text-red-500 text-xs">{formErrors.phoneNumber}</p>
+                <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>
               )}
-              <p className="text-xs text-gray-500">May be used to assist delivery</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="addressLine1">Flat, House no., Building, Company, Apartment</Label>
+            <div>
+              <Label htmlFor="addressLine1" className="text-sm font-medium">House/Flat No., Building</Label>
               <Input
                 id="addressLine1"
-                placeholder="House/Flat No., Building Name, Street"
+                placeholder="House No., Building Name"
                 value={currentAddress?.addressLine1 || ""}
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, addressLine1: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="addressLine2">Area, Street, Sector, Village</Label>
+            <div>
+              <Label htmlFor="addressLine2" className="text-sm font-medium">Area, Street</Label>
               <Input
                 id="addressLine2"
                 placeholder="Area, Street"
                 value={currentAddress?.addressLine2 || ""}
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, addressLine2: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="landmark">Landmark (Optional)</Label>
+            <div>
+              <Label htmlFor="landmark" className="text-sm font-medium">Landmark (Optional)</Label>
               <Input
                 id="landmark"
-                placeholder="E.g. near apollo hospital"
+                placeholder="E.g. near hospital"
                 value={currentAddress?.landmark || ""}
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, landmark: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="pincode">Pincode</Label>
+            <div>
+              <Label htmlFor="pincode" className="text-sm font-medium">Pincode</Label>
               <Input
                 id="pincode"
                 placeholder="6-digit Pincode"
@@ -344,45 +348,48 @@ const AddressManager: FC = () => {
                     setFormErrors(prev => ({ ...prev, pincode: undefined }));
                   }
                 }}
+                className="mt-1"
               />
               {formErrors.pincode && (
-                <p className="text-red-500 text-xs">{formErrors.pincode}</p>
+                <p className="text-red-500 text-xs mt-1">{formErrors.pincode}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="city">Town/City</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="city" className="text-sm font-medium">City</Label>
                 <Input
                   id="city"
                   placeholder="City"
                   value={currentAddress?.city || ""}
                   onChange={(e) => setCurrentAddress(prev => ({ ...prev, city: e.target.value }))}
+                  className="mt-1"
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
+              <div>
+                <Label htmlFor="state" className="text-sm font-medium">State</Label>
                 <Input
                   id="state"
                   placeholder="State"
                   value={currentAddress?.state || ""}
                   onChange={(e) => setCurrentAddress(prev => ({ ...prev, state: e.target.value }))}
+                  className="mt-1"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="deliveryInstructions">Delivery Instructions (Optional)</Label>
+            <div>
+              <Label htmlFor="deliveryInstructions" className="text-sm font-medium">Delivery Instructions (Optional)</Label>
               <Input
                 id="deliveryInstructions"
-                placeholder="Add preferences, notes, access codes and more"
+                placeholder="Special instructions"
                 value={currentAddress?.deliveryInstructions || ""}
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, deliveryInstructions: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
-            <div className="flex items-center space-x-2 pt-2">
+            <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 id="isDefault"
@@ -390,11 +397,11 @@ const AddressManager: FC = () => {
                 onChange={(e) => setCurrentAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
                 className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
               />
-              <Label htmlFor="isDefault" className="text-sm font-normal">Make this my default address</Label>
+              <Label htmlFor="isDefault" className="text-sm">Make this my default address</Label>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <Button variant="outline" onClick={() => setShowAddressModal(false)}>
               Cancel
             </Button>
