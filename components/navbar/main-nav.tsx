@@ -16,7 +16,6 @@ const categories = [
       { title: "Nightstands", href: "/search?category=nightstands" },
       { title: "Mirrors", href: "/search?category=mirrors" },
       { title: "Dressers", href: "/search?category=dressers" },
-      { title: "All", href: "/search?category=bedroom" },
     ],
   },
   {
@@ -27,7 +26,6 @@ const categories = [
       { title: "Tables", href: "/search?category=tables" },
       { title: "Cabinets", href: "/search?category=cabinets" },
       { title: "Chairs", href: "/search?category=chairs" },
-      { title: "All", href: "/search?category=living-room" },
     ],
   },
   {
@@ -38,7 +36,6 @@ const categories = [
       { title: "Desks", href: "/search?category=kids-desks" },
       { title: "Chairs", href: "/search?category=kids-chairs" },
       { title: "Storage", href: "/search?category=kids-storage" },
-      { title: "All", href: "/search?category=kids" },
     ],
   },
   {
@@ -63,7 +60,7 @@ const categories = [
   },
 ];
 
-export function MainNav() {
+export function   MainNav() {
   const [openDropdown, setOpenDropdown] = React.useState(null);
   const navRef = React.useRef(null);
 

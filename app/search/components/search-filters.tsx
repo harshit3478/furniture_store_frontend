@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { StarIcon } from "@/components/ui/star-icon"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface SearchFiltersProps {
   selectedCategories: string[]
@@ -20,6 +19,9 @@ interface SearchFiltersProps {
   onMaterialChange?: (materials: string[]) => void
   minRating?: number
   onRatingChange?: (rating: number) => void
+  onApply: () => void
+  tempPriceRange: [number, number]
+  onTempPriceChange: (range: [number, number]) => void
 }
 
 export default function SearchFilters({
@@ -27,23 +29,26 @@ export default function SearchFilters({
   onCategoryChange,
   priceRange,
   onPriceChange,
+  tempPriceRange,
+  onTempPriceChange,
   sortBy,
   onSortChange,
   selectedConditions = [],
-  onConditionChange = () => {},
+  onConditionChange = () => { },
   selectedMaterials = [],
-  onMaterialChange = () => {},
+  onMaterialChange = () => { },
   minRating = 0,
-  onRatingChange = () => {},
+  onRatingChange = () => { },
+  onApply,
 }: SearchFiltersProps) {
-  const [minPrice, setMinPrice] = useState(priceRange[0])
-  const [maxPrice, setMaxPrice] = useState(priceRange[1])
+  const [minPrice, setMinPrice] = useState(tempPriceRange[0])
+  const [maxPrice, setMaxPrice] = useState(tempPriceRange[1])
 
-  // Update local state when props change (from URL parameters)
+  // Update local state when temp props change
   useEffect(() => {
-    setMinPrice(priceRange[0])
-    setMaxPrice(priceRange[1])
-  }, [priceRange])
+    setMinPrice(tempPriceRange[0])
+    setMaxPrice(tempPriceRange[1])
+  }, [tempPriceRange])
 
   // Categories matching backend schema
   const categories = [
@@ -76,6 +81,14 @@ export default function SearchFilters({
     { id: "fabric", label: "Fabric" },
   ]
 
+  // Sort options
+  const sortOptions = [
+    { id: "name", label: "Popularity" },
+    { id: "price_asc", label: "Price: Low to High" },
+    { id: "price_desc", label: "Price: High to Low" },
+    { id: "createdAt_desc", label: "Newest First" },
+  ]
+
   // Rating options
   const ratingOptions = [1, 2, 3, 4, 5]
 
@@ -103,20 +116,42 @@ export default function SearchFilters({
     }
   }
 
-  const handlePriceInputChange = (min: number, max: number) => {
-    setMinPrice(min)
-    setMaxPrice(max)
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value) || 0
+    setMinPrice(value)
+    onTempPriceChange([value, maxPrice])
   }
 
-  const applyPriceFilter = () => {
-    onPriceChange([minPrice, maxPrice])
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value) || 20000
+    setMaxPrice(value)
+    onTempPriceChange([minPrice, value])
   }
 
   return (
     <div className="space-y-6">
+      {/* Sort By */}
+      <div className="space-y-3">
+        <h3 className="font-gilroyMedium text-purple-700">Sort By</h3>
+        <RadioGroup 
+          value={sortBy} 
+          onValueChange={onSortChange}
+          className="space-y-2"
+        >
+          {sortOptions.map((option) => (
+            <div key={option.id} className="flex items-center space-x-2">
+              <RadioGroupItem value={option.id} id={`sort-${option.id}`} />
+              <Label htmlFor={`sort-${option.id}`} className="text-sm font-normal cursor-pointer">
+                {option.label}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+
       {/* Categories */}
       <div className="space-y-3">
-        <h3 className="font-medium text-purple-700">Categories</h3>
+        <h3 className="font-gilroyMedium text-purple-700">Categories</h3>
         <div className="space-y-2">
           {categories.map((category) => (
             <div key={category.id} className="flex items-center space-x-2">
@@ -133,52 +168,32 @@ export default function SearchFilters({
         </div>
       </div>
 
-      {/* Price Range */}
+      {/* Price Range - Input Only */}
       <div className="space-y-3">
-        <h3 className="font-medium text-purple-700">Price</h3>
-        <div className="pt-2 px-1">
-          <Slider
-            value={[minPrice, maxPrice]}
-            max={20000}
-            step={100}
-            onValueChange={(values) => {
-              handlePriceInputChange(values[0], values[1])
-            }}
-            onValueCommit={(values) => {
-              onPriceChange([values[0], values[1]])
-            }}
-            className="mb-6"
-          />
-        </div>
-        <div className="flex items-center gap-2">
+        <h3 className="font-medium text-purple-700">Price Range ($)</h3>
+        <div className="flex flex-col space-y-3">
           <div className="flex items-center">
-            <span className="text-sm mr-1">Min:</span>
+            <Label htmlFor="min-price" className="w-24 text-sm">Min Price:</Label>
             <Input
+              id="min-price"
               type="number"
               value={minPrice}
-              onChange={(e) => {
-                const value = Number.parseInt(e.target.value)
-                if (!isNaN(value)) {
-                  handlePriceInputChange(value, maxPrice)
-                }
-              }}
-              onBlur={applyPriceFilter}
-              className="w-20 h-8 text-sm"
+              min={0}
+              max={maxPrice - 1}
+              onChange={handleMinPriceChange}
+              className="w-full"
             />
           </div>
           <div className="flex items-center">
-            <span className="text-sm mr-1">Max:</span>
+            <Label htmlFor="max-price" className="w-24 text-sm">Max Price:</Label>
             <Input
+              id="max-price"
               type="number"
               value={maxPrice}
-              onChange={(e) => {
-                const value = Number.parseInt(e.target.value)
-                if (!isNaN(value)) {
-                  handlePriceInputChange(minPrice, value)
-                }
-              }}
-              onBlur={applyPriceFilter}
-              className="w-20 h-8 text-sm"
+              min={minPrice + 1}
+              max={20000}
+              onChange={handleMaxPriceChange}
+              className="w-full"
             />
           </div>
         </div>
@@ -230,9 +245,8 @@ export default function SearchFilters({
             <button
               key={rating}
               onClick={() => onRatingChange(rating)}
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                minRating === rating ? 'bg-purple-600 text-white' : 'bg-gray-100'
-              }`}
+              className={`flex items-center justify-center w-8 h-8 rounded-full ${minRating === rating ? 'bg-purple-600 text-white' : 'bg-gray-100'
+                }`}
             >
               {rating}
             </button>
@@ -251,7 +265,7 @@ export default function SearchFilters({
       {/* Apply Filter Button - Desktop only */}
       <button
         className="w-full bg-purple-700 text-white py-2 rounded-md hidden lg:block"
-        onClick={() => onPriceChange([minPrice, maxPrice])}
+        onClick={onApply}
       >
         Apply filter
       </button>
