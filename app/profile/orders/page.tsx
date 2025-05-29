@@ -78,8 +78,8 @@ const MyOrdersPage: FC = () => {
 
       {/* Desktop Header - Hidden on Mobile */}
       <div className="hidden md:block mb-6">
-        <h1 className="text-2xl font-bold mb-2">My Orders</h1>
-        <p className="text-gray-500">See all orders and stay updated with their status</p>
+        <h1 className="text-3xl font-gilroySemibold mb-2">My Orders</h1>
+        <p className="text-gray-500 font-gilroy text-base mb-6">See all orders and stay updated with their status</p>
       </div>
 
       {/* Orders List */}

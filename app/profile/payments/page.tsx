@@ -190,8 +190,8 @@ const MyPaymentsPage: FC = () => {
 
       {/* Desktop Header - Hidden on Mobile */}
       <div className="hidden md:block mb-6">
-        <h1 className="text-2xl font-bold mb-2">My Payments</h1>
-        <p className="text-gray-500">
+        <h1 className="text-3xl font-gilroySemibold mb-2">My Payments</h1>
+        <p className="text-gray-500 font-gilroy text-base mb-6">
           Access your complete payment history on one page.
         </p>
       </div>
@@ -200,7 +200,7 @@ const MyPaymentsPage: FC = () => {
       <div className="hidden md:flex justify-between items-center mb-6">
         <div className="flex space-x-8">
           <div>
-            <span className="text-sm text-gray-500">Total Payments:</span>
+            <span className="text-lg text-purple-700 font-gilroyMedium">Total Payments:</span>
             <span className="ml-2 font-medium">{formatCurrency(totalPayments)}</span>
           </div>
         </div>
@@ -213,7 +213,7 @@ const MyPaymentsPage: FC = () => {
       {/* Payment Summary - Mobile */}
       <div className="md:hidden p-4 bg-purple-50 rounded-md mx-4 my-4">
         <div className="flex justify-between">
-          <span className="text-sm">Total Payments:</span>
+          <span className="text-2xl font-gilroyMedium">Total Payments:</span>
           <span className="font-medium text-primary">{formatCurrency(totalPayments)}</span>
         </div>
         <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-white" disabled={payments.length === 0}>
@@ -224,7 +224,7 @@ const MyPaymentsPage: FC = () => {
 
       {/* Payment History - Desktop */}
       <div className="hidden md:block">
-        <h2 className="text-lg font-medium mb-4">Payment History</h2>
+        <h2 className="text-lg font-gilroyMedium mb-4">Payment History :</h2>
         {payments.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
