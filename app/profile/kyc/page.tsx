@@ -10,14 +10,14 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { FileIcon, ChevronRight, Loader2, Eye } from "lucide-react";
+import { FileIcon, ChevronRight, Loader2, Eye, Upload, CheckCircle, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/lib/authContext";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
 type KycStatus = "unverified" | "verified" | "rejected" | "under_review";
 
@@ -34,12 +34,15 @@ const KycVerificationPage: FC = () => {
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const [kycDetails, setKycDetails] = useState<KycDetails>({ kycStatus: "unverified" });
   const [documentType, setDocumentType] = useState<string>("");
   const [documentId, setDocumentId] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [showImagePreview, setShowImagePreview] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -77,12 +80,53 @@ const KycVerificationPage: FC = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
+  const validateFile = (file: File): boolean => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
 
-      // Create a preview URL for the file
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a valid image (JPG, PNG) or PDF file");
+      return false;
+    }
+
+    if (file.size > maxSize) {
+      toast.error("File size must be less than 5MB");
+      return false;
+    }
+
+    return true;
+  };
+
+
+  const processFile = (selectedFile: File) => {
+    if (!validateFile(selectedFile)) {
+      return;
+    }
+
+    setFile(selectedFile);
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    // Simulate upload progress
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          setTimeout(() => {
+            setUploadProgress(100);
+            setIsUploading(false); // This enables the submit button
+          }, 200);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 100);
+
+    // Create a preview URL for the file
+    if (selectedFile.type === 'application/pdf') {
+      const blobUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(blobUrl);
+    } else {
       const fileReader = new FileReader();
       fileReader.onload = () => {
         if (fileReader.result) {
@@ -90,6 +134,51 @@ const KycVerificationPage: FC = () => {
         }
       };
       fileReader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files[0]) {
+      processFile(files[0]);
+    }
+  };
+
+  const removeFile = () => {
+    setFile(null);
+    // Clean up blob URL if it exists
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl("");
+    setUploadProgress(0);
+    setIsUploading(false);
+    // Reset file input
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
   };
 
@@ -130,9 +219,14 @@ const KycVerificationPage: FC = () => {
 
       toast.success("KYC documents submitted successfully");
       setFile(null);
+      // Clean up blob URL if it exists
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl("");
       setDocumentType("");
       setDocumentId("");
+      setUploadProgress(0);
     } catch (error) {
       console.error("Error submitting KYC documents:", error);
       toast.error("Failed to submit KYC documents");
@@ -142,7 +236,7 @@ const KycVerificationPage: FC = () => {
   };
 
   const getStatusColor = () => {
-    switch(kycDetails.kycStatus) {
+    switch (kycDetails.kycStatus) {
       case "verified": return "text-green-600";
       case "unverified": return "text-red-600";
       case "rejected": return "text-red-600";
@@ -152,7 +246,7 @@ const KycVerificationPage: FC = () => {
   };
 
   const getStatusText = () => {
-    switch(kycDetails.kycStatus) {
+    switch (kycDetails.kycStatus) {
       case "verified": return "Verified";
       case "unverified": return "Unverified";
       case "rejected": return "Rejected";
@@ -165,7 +259,7 @@ const KycVerificationPage: FC = () => {
     if (!dateString) return "-";
     try {
       return format(new Date(dateString), "dd MMMM yyyy");
-    } catch (error) {
+    } catch (err) {
       return dateString;
     }
   };
@@ -184,7 +278,7 @@ const KycVerificationPage: FC = () => {
       <div className="md:hidden bg-gray-50 py-2 px-4 text-sm text-primary flex items-center overflow-x-auto whitespace-nowrap">
         <Link href="/profile" className="hover:text-gray-900">Profile</Link>
         <ChevronRight size={14} className="mx-1" />
-        <span className="text-primary font-medium">KYC and Verification</span>
+        <span className="text-primary font-gilroyMedium">KYC and Verification</span>
       </div>
 
       {/* Mobile Header */}
@@ -204,12 +298,12 @@ const KycVerificationPage: FC = () => {
           {/* KYC Status */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-medium">KYC Status:</span>
+              <span className="font-gilroyMedium">KYC Status:</span>
               <span className={getStatusColor()}>{getStatusText()}</span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="font-medium">Date of Verification:</span>
+              <span className="font-gilroyMedium">Date of Verification:</span>
               {kycDetails.kycStatus === "verified" ? (
                 <span>{formatDate(kycDetails.updatedAt)}</span>
               ) : (
@@ -221,18 +315,18 @@ const KycVerificationPage: FC = () => {
           {kycDetails.kycStatus === "verified" ? (
             // Verified KYC View
             <div className="space-y-4">
-              <h2 className="text-lg font-medium">Uploaded Documents</h2>
+              <h2 className="text-xl font-gilroyMedium">Uploaded Documents</h2>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Document Type:</span>
+                  <span className="font-gilroyMedium mb-2">Document Type:</span>
                   <span>{kycDetails.documentType}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Document ID:</span>
+                  <span className="font-gilroyMedium mb-2">Document ID:</span>
                   <span>{kycDetails.documentId}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Upload Date:</span>
+                  <span className="font-gilroyMedium">Upload Date:</span>
                   <span>{formatDate(kycDetails.createdAt)}</span>
                 </div>
                 {kycDetails.documentImage && (
@@ -244,14 +338,24 @@ const KycVerificationPage: FC = () => {
                           View Document
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <div className="relative h-[70vh] w-full">
-                          <Image
-                            src={kycDetails.documentImage}
-                            alt="KYC Document"
-                            fill
-                            className="object-contain"
-                          />
+                      <DialogContent className="max-w-4xl max-h-[90vh]">
+                        <DialogTitle>KYC Document</DialogTitle>
+                        <div className="relative h-[80vh] w-full">
+                          {kycDetails.documentImage.toLowerCase().includes('.pdf') ||
+                            kycDetails.documentType?.toLowerCase().includes('pdf') ? (
+                            <iframe
+                              src={kycDetails.documentImage}
+                              className="w-full h-full rounded"
+                              title="KYC Document"
+                            />
+                          ) : (
+                            <Image
+                              src={kycDetails.documentImage}
+                              alt="KYC Document"
+                              fill
+                              className="object-contain"
+                            />
+                          )}
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -262,18 +366,18 @@ const KycVerificationPage: FC = () => {
           ) : kycDetails.kycStatus === "under_review" ? (
             // Under Review KYC View
             <div className="space-y-4">
-              <h2 className="text-lg font-medium">Uploaded Documents</h2>
+              <h2 className="text-lg font-gilroyMedium">Uploaded Documents</h2>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Document Type:</span>
+                  <span className="font-gilroyMedium mb-2">Document Type:</span>
                   <span>{kycDetails.documentType}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Document ID:</span>
+                  <span className="font-gilroyMedium mb-2">Document ID:</span>
                   <span>{kycDetails.documentId}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Upload Date:</span>
+                  <span className="font-gilroyMedium">Upload Date:</span>
                   <span>{formatDate(kycDetails.createdAt)}</span>
                 </div>
                 {kycDetails.documentImage && (
@@ -285,14 +389,24 @@ const KycVerificationPage: FC = () => {
                           View Document
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <div className="relative h-[70vh] w-full">
-                          <Image
-                            src={kycDetails.documentImage}
-                            alt="KYC Document"
-                            fill
-                            className="object-contain"
-                          />
+                      <DialogContent className="max-w-4xl max-h-[90vh]">
+                        <DialogTitle>KYC Document</DialogTitle>
+                        <div className="relative h-[80vh] w-full">
+                          {kycDetails.documentImage.toLowerCase().includes('.pdf') ||
+                            kycDetails.documentType?.toLowerCase().includes('pdf') ? (
+                            <iframe
+                              src={kycDetails.documentImage}
+                              className="w-full h-full rounded"
+                              title="KYC Document"
+                            />
+                          ) : (
+                            <Image
+                              src={kycDetails.documentImage}
+                              alt="KYC Document"
+                              fill
+                              className="object-contain"
+                            />
+                          )}
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -306,7 +420,7 @@ const KycVerificationPage: FC = () => {
           ) : (
             // Unverified or Rejected KYC View
             <div className="space-y-4">
-              <h2 className="text-lg font-medium">Upload Documents</h2>
+              <h2 className="text-lg font-gilroyMedium mb-2">Upload Documents</h2>
 
               {kycDetails.kycStatus === "rejected" && (
                 <div className="p-3 bg-red-50 text-red-800 rounded-md text-sm mb-4">
@@ -316,7 +430,7 @@ const KycVerificationPage: FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Document Type:</label>
+                  <label className="block text-sm font-gilroyMedium mb-2">Document Type:</label>
                   <Select value={documentType} onValueChange={setDocumentType}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select Document Type" />
@@ -331,7 +445,7 @@ const KycVerificationPage: FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Document ID:</label>
+                  <label className="block text-sm font-gilroyMedium mb-2">Document ID:</label>
                   <Input
                     placeholder="Enter your document number"
                     value={documentId}
@@ -340,10 +454,18 @@ const KycVerificationPage: FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Upload Document:</label>
+                  <label className="block text-sm font-gilroyMedium mb-2">Upload Document:</label>
                   <div
-                    className="border border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => document.getElementById('fileInput')?.click()}
+                    className={`border-2 border-dashed rounded-lg p-6 transition-all duration-200 cursor-pointer ${isDragOver
+                      ? 'border-purple-500 bg-purple-50'
+                      : file
+                        ? 'border-green-300 bg-green-50'
+                        : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                      }`}
+                    onClick={() => !file && document.getElementById('fileInput')?.click()}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                   >
                     <input
                       type="file"
@@ -352,30 +474,85 @@ const KycVerificationPage: FC = () => {
                       onChange={handleFileChange}
                       accept="image/*,.pdf"
                     />
-                    {previewUrl ? (
-                      <div className="relative h-40 w-full mb-2">
-                        <Image
-                          src={previewUrl}
-                          alt="Document Preview"
-                          fill
-                          className="object-contain"
-                        />
+
+                    {file ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                            <span className="text-sm font-gilroyMedium text-green-700">
+                              {file.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowImagePreview(true);
+                              }}
+                              className="flex items-center"
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Preview
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFile();
+                              }}
+                              className="text-red-500 border border-red-400 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {isUploading && (
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Uploading...</span>
+                              <span>{uploadProgress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${uploadProgress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      <FileIcon className="h-10 w-10 text-purple-300 mb-2" />
+                      <div className="flex flex-col items-center justify-center text-center">
+                        {isDragOver ? (
+                          <>
+                            <Upload className="h-10 w-10 text-purple-500 mb-2" />
+                            <p className="text-purple-600 font-gilroyMedium">Drop your document here</p>
+                          </>
+                        ) : (
+                          <>
+                            <FileIcon className="h-10 w-10 text-gray-400 mb-2" />
+                            <p className="text-gray-600 font-gilroyMedium mb-1">
+                              Drop a document here or click to browse
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              Supported formats: JPG, PNG, PDF (Max 5MB)
+                            </p>
+                          </>
+                        )}
+                      </div>
                     )}
-                    <p className="text-center text-sm">
-                      {previewUrl ? "Click to change document" : "Drop a picture of the document here"}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">Supported formats: JPG, PNG, PDF</p>
                   </div>
                 </div>
-
                 <div className="flex justify-end">
                   <Button
                     className="bg-purple-600 hover:bg-purple-700 text-white"
                     onClick={handleSubmit}
-                    disabled={isSubmitting || !documentType || !documentId || !file}
+                    disabled={isSubmitting || !documentType || !documentId || !file || isUploading}
                   >
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Submit
@@ -387,17 +564,26 @@ const KycVerificationPage: FC = () => {
         </div>
       </Card>
 
-      {/* Image Preview Dialog */}
+      {/* Image/PDF Preview Dialog */}
       <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogTitle>Document Preview</DialogTitle>
           {previewUrl && (
-            <div className="relative h-[70vh] w-full">
-              <Image
-                src={previewUrl}
-                alt="Document Preview"
-                fill
-                className="object-contain"
-              />
+            <div className="relative h-[80vh] w-full">
+              {file && file.type === 'application/pdf' ? (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-full rounded"
+                  title="Document Preview"
+                />
+              ) : (
+                <Image
+                  src={previewUrl}
+                  alt="Document Preview"
+                  fill
+                  className="object-contain"
+                />
+              )}
             </div>
           )}
         </DialogContent>

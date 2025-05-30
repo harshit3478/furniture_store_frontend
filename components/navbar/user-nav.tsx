@@ -64,7 +64,7 @@ export function UserNav({ user }: UserNavProps) {
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center">
+                <Link href="/profile/settings" className="flex items-center">
                   <UserIcon className="mr-2 h-5 w-5" />
                   My Account
                 </Link>
