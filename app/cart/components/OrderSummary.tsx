@@ -108,7 +108,7 @@ export function OrderSummary({
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Total Rent:</h2>
+        <h2 className="text-lg font-gilroySemibold mb-4">Total Rent:</h2>
 
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -134,7 +134,7 @@ export function OrderSummary({
             </div>
           )}
 
-          <div className="border-t pt-3 flex justify-between font-semibold">
+          <div className="border-t pt-3 flex justify-between font-gilroySemibold">
             <span>Total Amount</span>
             <span>₹{finalTotal.toFixed(2)}</span>
           </div>
@@ -142,7 +142,7 @@ export function OrderSummary({
       </Card>
 
         <Button
-          className="w-full bg-primary hover:bg-primary/90 text-white py-3"
+          className="w-full font-gilroyMedium text-base bg-primary hover:bg-primary/90 text-white py-3"
           disabled={selectedItemsCount === 0 || isProcessingOrder}
           onClick={async () => {
             if (!user) {
@@ -216,7 +216,7 @@ export function OrderSummary({
         </Button>
       <div className="space-y-6">
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">Apply Coupon</h3>
+          <h3 className="font-gilroySemibold mb-4">Apply Coupon</h3>
 
           {appliedCoupon ? (
             <div className="space-y-4">
@@ -224,7 +224,7 @@ export function OrderSummary({
                 <div>
                   <div className="flex items-center">
                     <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                    <span className="font-medium">{appliedCoupon.code}</span>
+                    <span className="font-gilroyMedium">{appliedCoupon.code}</span>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{appliedCoupon.description}</p>
                   <p className="text-sm text-green-600 mt-1">Saved ₹{discountAmount.toFixed(2)}</p>
@@ -263,7 +263,7 @@ export function OrderSummary({
               )}
 
               <div className="bg-purple-50 rounded-lg p-3">
-                <h4 className="font-medium text-primary text-sm mb-1">Available Coupons</h4>
+                <h4 className="font-gilroyMedium text-primary text-sm mb-1">Available Coupons</h4>
                 <p className="text-xs text-primary">WELCOME10: Get 10% off on your first order</p>
                 <p className="text-xs text-primary mt-1">FURNITURE20: Get 20% off on orders above ₹5000</p>
               </div>

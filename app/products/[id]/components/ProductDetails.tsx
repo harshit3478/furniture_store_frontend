@@ -5,6 +5,7 @@ import { Star, StarHalf, Minus, Plus, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { ProductType } from "@/types/product"
+import { WishlistButton } from "@/components/ui/wishlist-button"
 import AddToCartButton from "./AddToCartButton"
 
 interface ProductDetailsProps {
@@ -69,7 +70,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             Featured
           </Badge>
         )}
-        <h1 className="text-3xl font-bold">{product.name}</h1>
+        <div className="flex *flex-col justify-between">
+        <h1 className="text-3xl font-bold ">{product.name}</h1>
+        <WishlistButton product={product} className="  bg-white/80 hover:bg-white"/>
+        </div>
+        
 
         <div className="flex items-center mt-2">
           <div className="flex text-amber-400">
@@ -81,11 +86,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <span className="text-sm ml-2">{product.reviewCount || 0} reviews</span>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-3">
+        {/* <div className="flex flex-wrap gap-2 mt-3">
           <Badge variant="secondary">{product.category}</Badge>
           {product.subcategory && <Badge variant="secondary">{product.subcategory}</Badge>}
           <Badge variant="outline">{product.condition}</Badge>
-        </div>
+        </div> */}
       </div>
 
       <div className="mb-6">

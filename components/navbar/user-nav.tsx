@@ -3,6 +3,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { User } from "firebase/auth"
 import { ShoppingCart, UserIcon, LogIn, Heart } from "lucide-react"
+import { useWishlist } from "@/lib/wishlist-context"
+import { useCart } from "@/lib/cartContext"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +22,11 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
   const router = useRouter()
+  const { wishlist } = useWishlist()
+  const { cart } = useCart()
+  
+  const wishlistCount = wishlist?.length || 0
+  const cartCount = cart?.length || 0
 
   const handleSignOut = async () => {
     try {
@@ -33,13 +40,23 @@ export function UserNav({ user }: UserNavProps) {
   return (
     <div className="flex items-center gap-1 md:gap-2">
       <Link href="/wishlist">
-        <Button variant="ghost" size="icon" className="h-10 w-10" aria-label="Wishlist">
-          <Heart className="h-10 w-10 text-gray-500" />
+        <Button variant="ghost" size="icon" className="h-10 w-10 relative" aria-label="Wishlist">
+          <Heart className="h-6 w-6 text-gray-500" />
+          {wishlistCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[1.25rem]">
+              {wishlistCount > 99 ? '99+' : wishlistCount}
+            </span>
+          )}
         </Button>
       </Link>
       <Link href="/cart">
-        <Button variant="ghost" size="icon" className="h-10 w-10" aria-label="Cart">
+        <Button variant="ghost" size="icon" className="h-10 w-10 relative" aria-label="Cart">
           <ShoppingCart className="h-6 w-6 text-gray-500" />
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[1.25rem]">
+              {cartCount > 99 ? '99+' : cartCount}
+            </span>
+          )}
         </Button>
       </Link>
       <DropdownMenu>

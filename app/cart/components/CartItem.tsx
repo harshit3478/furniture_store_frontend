@@ -34,10 +34,10 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
   }
 
   return (
-    <Card className="p-4 relative">
+    <Card className="py-6 px-6 relative">
       <div className="flex items-start gap-2">
         {/* Checkbox for item selection */}
-        <div className="pt-1 hidden md:block">
+        <div className="pt-1 mr-4 hidden md:block">
           <Checkbox checked={isSelected} onCheckedChange={onSelect} className="h-5 w-5" />
         </div>
 
@@ -45,7 +45,7 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
           {/* Mobile checkbox */}
           <div className="flex items-center md:hidden mb-2">
             <Checkbox checked={isSelected} onCheckedChange={onSelect} className="h-5 w-5 mr-2" />
-            <span className="text-sm font-medium">Select item</span>
+            <span className="text-sm font-gilroyMedium">Select item</span>
           </div>
 
           <div className="flex-shrink-0">
@@ -53,9 +53,9 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
               <Image
                 src={item.product.heroImage || item.product.image || "/placeholder.svg?height=120&width=120"}
                 alt={item.product.name}
-                width={140}
-                height={140}
-                className="rounded-none object-cover hover:opacity-90 transition-opacity"
+                width={120}
+                height={120}
+                className="rounded-sm object-cover hover:opacity-90 transition-opacity"
               />
             </Link>
           </div>
@@ -65,9 +65,9 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
               <div className="flex justify-between items-start">
                 <div>
                   <Link href={`/products/${item.product.id}`} className="hover:text-primary transition-colors">
-                    <h2 className="text-lg font-semibold">{item.product.name}</h2>
+                    <h2 className="text-lg font-gilroyMedium">{item.product.name}</h2>
                   </Link>
-                  <p className="text-primary text-sm font-medium">
+                  <p className="text-primary text-sm font-gilroyMedium">
                     ₹{item.pricePerMonth}/month
                   </p>
                 </div>
@@ -111,22 +111,22 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
               </div>
 
               {/* Info grid - desktop */}
-              <div className="hidden md:grid grid-cols-4 items-center w-full mt-4">
+              <div className="hidden md:grid grid-cols-4 items-center w-full">
                 <div className="flex flex-col border-r border-slate-300 items-left pr-2 py-1">
                   <p className="text-slate-600 text-xs">Renting for</p>
-                  <p className="text-black font-medium text-sm">{item.duration} Months</p>
+                  <p className="text-black font-gilroyMedium text-sm">{item.duration} Months</p>
                 </div>
                 <div className="flex flex-col border-r border-slate-300 items-left px-2 py-1 pl-4">
                   <p className="text-slate-600 text-xs">Quantity</p>
-                  <p className="text-black font-medium text-sm">{item.quantity}</p>
+                  <p className="text-black font-gilroyMedium text-sm">{item.quantity}</p>
                 </div>
                 <div className="flex flex-col border-r border-slate-300 items-left px-2 py-1 pl-4">
                   <p className="text-slate-600 text-xs">Total Rent</p>
-                  <p className="text-black font-medium text-sm">₹{(item.total)}</p>
+                  <p className="text-black font-gilroyMedium text-sm">₹{(item.total)}</p>
                 </div>
                 <div className="flex flex-col items-left px-2 py-1 pl-4">
                   <p className="text-slate-600 text-xs">Delivered By</p>
-                  <p className="text-black font-medium text-sm">{calculateDeliveryDate()}</p>
+                  <p className="text-black font-gilroyMedium text-sm">{calculateDeliveryDate()}</p>
                 </div>
               </div>
 
@@ -134,19 +134,19 @@ export const CartItem = ({ item, isSelected = false, onSelect = () => {} }: Cart
               <div className="grid grid-cols-2 md:hidden gap-2 mt-2">
                 <div className="flex flex-col border border-slate-200 rounded p-2">
                   <p className="text-slate-600 text-xs">Renting for</p>
-                  <p className="text-black font-medium text-sm">{item.duration} Months</p>
+                  <p className="text-black font-gilroyMedium text-sm">{item.duration} Months</p>
                 </div>
                 <div className="flex flex-col border border-slate-200 rounded p-2">
                   <p className="text-slate-600 text-xs">Quantity</p>
-                  <p className="text-black font-medium text-sm">{item.quantity}</p>
+                  <p className="text-black font-gilroyMedium text-sm">{item.quantity}</p>
                 </div>
                 <div className="flex flex-col border border-slate-200 rounded p-2">
                   <p className="text-slate-600 text-xs">Total Rent</p>
-                  <p className="text-black font-medium text-sm">₹{(item.total)}</p>
+                  <p className="text-black font-gilroyMedium text-sm">₹{(item.total)}</p>
                 </div>
                 <div className="flex flex-col border border-slate-200 rounded p-2">
                   <p className="text-slate-600 text-xs">Delivered By</p>
-                  <p className="text-black font-medium text-sm">{calculateDeliveryDate()}</p>
+                  <p className="text-black font-gilroyMedium text-sm">{calculateDeliveryDate()}</p>
                 </div>
               </div>
 
