@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/lib/cartContext";
 import { AuthProvider } from "@/lib/authContext";
+import { CouponProvider } from "@/lib/couponContext"
 import localFont from 'next/font/local';
 import { WishlistProvider } from "@/lib/wishlist-context";
 
@@ -37,12 +38,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${gilroy.variable} ${gilroySemibold.variable} ${gilroyMedium.variable} font-gilroy`}>
         <AuthProvider>
+          <CouponProvider>
           <CartProvider>
             <WishlistProvider>
             {children}
             <Analytics/>
             </WishlistProvider>
           </CartProvider>
+          </CouponProvider>
         </AuthProvider>
       </body>
     </html>

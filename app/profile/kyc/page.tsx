@@ -19,7 +19,8 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
-type KycStatus = "unverified" | "verified" | "rejected" | "under_review";
+// Updated to match backend values
+type KycStatus = "Rejected" | "Approved" | "Pending" | "Unverified";
 
 interface KycDetails {
   kycStatus: KycStatus;
@@ -36,7 +37,8 @@ const KycVerificationPage: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [kycDetails, setKycDetails] = useState<KycDetails>({ kycStatus: "unverified" });
+  // Updated default status to match backend
+  const [kycDetails, setKycDetails] = useState<KycDetails>({ kycStatus: "Unverified" });
   const [documentType, setDocumentType] = useState<string>("");
   const [documentId, setDocumentId] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
@@ -64,8 +66,9 @@ const KycVerificationPage: FC = () => {
       }
 
       const data = await response.json();
+      console.log(data);
       setKycDetails({
-        kycStatus: data.kycStatus,
+        kycStatus: data.kycStatus || "Unverified", // Fallback to Unverified if no status
         documentType: data.documentType,
         documentId: data.documentId,
         documentImage: data.documentImage,
@@ -96,7 +99,6 @@ const KycVerificationPage: FC = () => {
 
     return true;
   };
-
 
   const processFile = (selectedFile: File) => {
     if (!validateFile(selectedFile)) {
@@ -209,7 +211,7 @@ const KycVerificationPage: FC = () => {
 
       const data = await response.json();
       setKycDetails({
-        kycStatus: data.kycStatus,
+        kycStatus: data.kycStatus || "Pending", // Default to Pending after submission
         documentType: data.documentType,
         documentId: data.documentId,
         documentImage: data.documentImage,
@@ -235,22 +237,24 @@ const KycVerificationPage: FC = () => {
     }
   };
 
+  // Updated status color mapping for backend values
   const getStatusColor = () => {
     switch (kycDetails.kycStatus) {
-      case "verified": return "text-green-600";
-      case "unverified": return "text-red-600";
-      case "rejected": return "text-red-600";
-      case "under_review": return "text-yellow-600";
+      case "Approved": return "text-green-600";
+      case "Rejected": return "text-red-600";
+      case "Pending": return "text-yellow-600";
+      case "Unverified": return "text-red-600";
       default: return "text-red-600";
     }
   };
 
+  // Updated status text mapping for backend values
   const getStatusText = () => {
     switch (kycDetails.kycStatus) {
-      case "verified": return "Verified";
-      case "unverified": return "Unverified";
-      case "rejected": return "Rejected";
-      case "under_review": return "Under Review";
+      case "Approved": return "Verified";
+      case "Rejected": return "Rejected";
+      case "Pending": return "Under Review";
+      case "Unverified": return "Unverified";
       default: return "Unverified";
     }
   };
@@ -304,7 +308,7 @@ const KycVerificationPage: FC = () => {
 
             <div className="flex items-center justify-between">
               <span className="font-gilroyMedium">Date of Verification:</span>
-              {kycDetails.kycStatus === "verified" ? (
+              {kycDetails.kycStatus === "Approved" ? (
                 <span>{formatDate(kycDetails.updatedAt)}</span>
               ) : (
                 <span>-</span>
@@ -312,8 +316,8 @@ const KycVerificationPage: FC = () => {
             </div>
           </div>
 
-          {kycDetails.kycStatus === "verified" ? (
-            // Verified KYC View
+          {kycDetails.kycStatus === "Approved" ? (
+            // Approved KYC View
             <div className="space-y-4">
               <h2 className="text-xl font-gilroyMedium">Uploaded Documents</h2>
               <div className="space-y-2">
@@ -363,8 +367,8 @@ const KycVerificationPage: FC = () => {
                 )}
               </div>
             </div>
-          ) : kycDetails.kycStatus === "under_review" ? (
-            // Under Review KYC View
+          ) : kycDetails.kycStatus === "Pending" ? (
+            // Pending KYC View
             <div className="space-y-4">
               <h2 className="text-lg font-gilroyMedium">Uploaded Documents</h2>
               <div className="space-y-2">
@@ -422,7 +426,7 @@ const KycVerificationPage: FC = () => {
             <div className="space-y-4">
               <h2 className="text-lg font-gilroyMedium mb-2">Upload Documents</h2>
 
-              {kycDetails.kycStatus === "rejected" && (
+              {kycDetails.kycStatus === "Rejected" && (
                 <div className="p-3 bg-red-50 text-red-800 rounded-md text-sm mb-4">
                   Your document was rejected. Please ensure you upload a clear image of a valid document.
                 </div>

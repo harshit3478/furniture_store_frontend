@@ -65,7 +65,6 @@ export function RazorpayHandler({
           toast.error("Failed to get payment details");
           return;
         }
-        
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Use environment variable
           amount: finalTotal * 100, // Amount is in currency subunits

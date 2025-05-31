@@ -2,8 +2,9 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { OfferCard } from "@/components/offer-card";
+import { useCoupons, type Coupon } from "@/lib/couponContext";
 
-// Define the Offer type (could be moved to a separate types file)
+// Transform coupon data to match OfferCard expected format
 interface Offer {
   id: string;
   title: string;
@@ -14,56 +15,147 @@ interface Offer {
   color: string;
 }
 
-// Sample offers data with explicit typing
-const offers: Offer[] = [
-  {
-    id: "1",
-    title: "Code10",
-    subtitle: "Get 10% off upto ₹200",
-    code: "CODE10",
-    expiry: "05/08/2021 04:00 – 09/08/2021 12:00",
-    terms: "Only for second order. Cannot be combined with other discounts.",
-    color: "bg-purple-100",
-  },
-  {
-    id: "2",
-    title: "Code20",
-    subtitle: "Get 20% off upto ₹500",
-    code: "CODE20",
-    expiry: "Valid until 31.12.2023",
-    terms: "Cannot be combined with other promotions.",
-    color: "bg-blue-100",
-  },
-  {
-    id: "3",
-    title: "Code10",
-    subtitle: "Get 10% off upto ₹200",
-    code: "CODE10",
-    expiry: "05/08/2021 04:00 – 09/08/2021 12:00",
-    terms: "Only for second order. Cannot be combined with other discounts.",
-    color: "bg-purple-100",
-  },
-  {
-    id: "4",
-    title: "Code20",
-    subtitle: "Get 20% off upto ₹500",
-    code: "CODE20",
-    expiry: "Valid until 31.12.2023",
-    terms: "Cannot be combined with other promotions.",
-    color: "bg-blue-100",
-  },
-  {
-    id: "5",
-    title: "Code20",
-    subtitle: "Get 20% off upto ₹500",
-    code: "CODE20",
-    expiry: "Valid until 31.12.2023",
-    terms: "Cannot be combined with other promotions.",
-    color: "bg-blue-100",
-  },
+// Helper function to format dates
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+// Helper function to generate subtitle based on coupon data
+const generateSubtitle = (coupon: Coupon): string => {
+  if (coupon.discountType === 'percentage') {
+    const maxDiscount = coupon.maxDiscountAmount 
+      ? ` upto ₹${coupon.maxDiscountAmount}` 
+      : '';
+    return `Get ${coupon.discountValue}% off${maxDiscount}`;
+  } else {
+    return `Flat ₹${coupon.discountValue} off`;
+  }
+};
+
+// Helper function to generate terms based on coupon data
+const generateTerms = (coupon: Coupon): string => {
+  const terms = [];
+  
+  if (coupon.minOrderValue > 0) {
+    terms.push(`Minimum order value: ₹${coupon.minOrderValue}`);
+  }
+  
+  if (coupon.usageLimit) {
+    const remaining = coupon.usageLimit - coupon.usageCount;
+    terms.push(`${remaining} uses remaining`);
+  }
+  
+  if (terms.length === 0) {
+    terms.push("Cannot be combined with other promotions.");
+  }
+  
+  return terms.join('. ');
+};
+
+// Color options for cards
+const colorOptions = [
+  "bg-purple-100",
+  "bg-blue-100", 
+  "bg-green-100",
+  "bg-pink-100",
+  "bg-yellow-100",
+  "bg-indigo-100"
 ];
 
+// Transform coupon to offer format
+const transformCouponToOffer = (coupon: Coupon, index: number): Offer => ({
+  id: coupon.id,
+  title: coupon.code,
+  subtitle: generateSubtitle(coupon),
+  code: coupon.code,
+  expiry: `Valid until ${formatDate(coupon.endDate)}`,
+  terms: generateTerms(coupon),
+  color: colorOptions[index % colorOptions.length],
+});
+
 export function OffersSection() {
+  const { loading, error, getActiveCoupons } = useCoupons();
+
+  // Get only active coupons
+  const activeCoupons = getActiveCoupons();
+  
+  // Transform coupons to offers format
+  const offers = activeCoupons.map((coupon, index) => 
+    transformCouponToOffer(coupon, index)
+  );
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="py-8 px-8 w-full bg-[#F7F6FD]">
+        <div className="container">
+          <div className="mb-6">
+            <h2 className="text-3xl font-gilroySemibold mb-2">Offers</h2>
+            <p className="text-muted-foreground text-base">
+              Loading amazing deals for you...
+            </p>
+          </div>
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="py-8 px-8 w-full bg-[#F7F6FD]">
+        <div className="container">
+          <div className="mb-6">
+            <h2 className="text-3xl font-gilroySemibold mb-2">Offers</h2>
+            <p className="text-muted-foreground text-base">
+              Unable to load offers at the moment.
+            </p>
+          </div>
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // No offers available
+  if (offers.length === 0) {
+    return (
+      <section className="py-8 px-8 w-full bg-[#F7F6FD]">
+        <div className="container">
+          <div className="mb-6">
+            <h2 className="text-3xl font-gilroySemibold mb-2">Offers</h2>
+            <p className="text-muted-foreground text-base">
+              No active offers available at the moment.
+            </p>
+          </div>
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              Check back soon for exciting deals!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-8 px-8 w-full bg-[#F7F6FD]">
       <div className="container">
@@ -77,11 +169,11 @@ export function OffersSection() {
           spaceBetween={30}
           slidesPerView={1}
           breakpoints={{
-            768: { slidesPerView: 4 },
+            768: { slidesPerView: Math.min(4, offers.length) },
           }}
         >
           {offers.map((offer) => (
-            <SwiperSlide key={offer.id} className=" rounded-md ">
+            <SwiperSlide key={offer.id} className="rounded-md">
               <OfferCard offer={offer} />
             </SwiperSlide>
           ))}

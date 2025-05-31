@@ -175,7 +175,7 @@ export default function CheckoutPage() {
     try {
       // Get selected cart item IDs from localStorage
       const selectedItemIds = JSON.parse(localStorage.getItem('selectedCartItems') || '[]');
-
+      console.log("Applied Coupon is : ",appliedCoupon);
       if (selectedItemIds.length === 0) {
         toast.error("No items selected for checkout");
         return null;
@@ -190,7 +190,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           cartItemIds: selectedItemIds,
           addressId: selectedAddressId,
-          couponCode: appliedCoupon?.code
+          couponCode: appliedCoupon
         })
       });
 
@@ -217,6 +217,7 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
     try {
+      console.log("APplied coupon : ", appliedCoupon);
       const newOrderId = await createOrder();
       if (newOrderId) {
         // Clear localStorage data after successful order creation
