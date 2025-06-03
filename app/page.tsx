@@ -13,8 +13,11 @@ import { useCart } from "@/lib/cartContext";
 import { Footer } from "@/components/footer/Footer";
 
 export default function Home() {
+  // state of user login
   const { token } = useAuth();
+  // states of local cart
   const { localCart } = useCart();
+  // whether user wants to sync local cart with server
   const [syncModal, setSyncModal] = useState(false);
 
   useEffect(() => {

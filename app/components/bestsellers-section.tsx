@@ -48,7 +48,7 @@ export function BestsellersSection() {
       <div className="container px-0 mx-auto">
         <div className="flex justify-between items-center mb-4 md:mb-6">
           <div>
-            <h2 className="text-3xl font-gilroySemibold mb-2">Weekly Bestsellers</h2>
+            <h2 className="text-3xl font-gilroySemibold mb-2">Top sellers for the week</h2>
             <p className="text-muted-foreground text-base">Checkout what&apos;s hot in the market!</p>
           </div>
           <Link
